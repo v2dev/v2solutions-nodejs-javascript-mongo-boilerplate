@@ -36,7 +36,7 @@ The Employee List project is a Node.js-based API allowing users to perform CRUD 
 
 ## Environment Variables
 
-Update the `.env` file with the following details:
+Create .env file in root directory and Update the `.env` file with the following details:
 
 - **MONGO_URI**: Add your MongoDB URL here.
 - **JWT_TOKEN**: Set your JSON Web Token secret.
