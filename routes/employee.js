@@ -41,70 +41,96 @@ const Employee = require("../model/Employee");
  *           sort: desc,
  *           filter: afsar,
  *
- *
- *
+ *     Add:
+ *       type: object
+ *       required:
+ *         - name
+ *         - email
+ *         - dob
+ *         - designation
+ *         - education
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: The name of the employee
+ *         email:
+ *           type: string
+ *           description: email
+ *         dob:
+ *           type: string
+ *           description: dob
+ *         designation:
+ *           type: string
+ *           description: designation
+ *         education:
+ *           type: string
+ *           description: education
+ *       example:
+ *         name: "Afsar"
+ *         email: "afsar@gmail.com"
+ *         dob: "20/05/1993"
+ *         designation: "Software Engineer"
+ *         education: "BE"
  */
-
-// /**
-//  * @swagger
-//  * tags:
-//  *   name: Employees
-//  *   description: CRUD Operation on Employees documents
- //*/
 
 /**
  * @swagger
-//  * /employee/get:
-//  *   get:
-//  *     security:
-//  *       - Authorization: []
-//  *     summary: Fetch all the employees list
-//  *     tags: [Employees]
-//  *     parameters:
-//  *       - in: query
-//  *         name: limit
-//  *         required: true
-//  *         schema:
-//  *           type: integer
-//  *           required: true
-//  *           description: limit the docs
-//  *       - in: query
-//  *         name: page
-//  *         required: true
-//  *         schema:
-//  *           type: integer
-//  *           required: true
-//  *           description: Number of pages
-//  *       - in: query
-//  *         name: filter
-//  *
-//  *         schema:
-//  *           type: string
-//  *
-//  *           description: It will filter bases on the name column.
-//  *       - in: query
-//  *         name: sort
-//  *         required: true
-//  *         schema:
-//  *           type: string
-//  *           required: true
-//  *           description: Sorting - 'asc' or 'desc'
-//  *       - in: query
-//  *         name: sortedColumn
-//  *         required: true
-//  *         schema:
-//  *           type: string
-//  *           required: true
-//  *           description: Column name i.e email, dob, desgination...
-//  *     responses:
-//  *       200:
-//  *         description: It will display record based on the filter applied
-//  *         content:
-//  *           application/json:
-//  *             schema:
-//  *               $ref: '#/components/schemas/GetEmployee'
-//  *       500:
-//  *         description: Some server error
+ * tags:
+ *   name: Employees
+ *   description: CRUD Operation on Employees data
+ */
+
+/**
+ * @swagger
+ * /employee/get:
+ *   get:
+ *     security:
+ *       - Authorization: []
+ *     summary: Fetch all the employees list
+ *     tags: [Employees]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           required: true
+ *           description: limit the docs
+ *       - in: query
+ *         name: page
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           required: true
+ *           description: Number of pages
+ *       - in: query
+ *         name: filter
+ *         schema:
+ *           type: string
+ *           description: It will filter bases on the name column.
+ *       - in: query
+ *         name: sort
+ *         required: true
+ *         schema:
+ *           type: string
+ *           required: true
+ *           description: Sorting - 'asc' or 'desc'
+ *       - in: query
+ *         name: sortedColumn
+ *         required: true
+ *         schema:
+ *           type: string
+ *           required: true
+ *           description: Column name i.e email, dob, desgination...
+ *     responses:
+ *       200:
+ *         description: It will display record based on the filter applied
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/GetEmployee'
+ *       500:
+ *         description: Some server error
  */
 
 router.get("/get", auth, async (req, res) => {
@@ -156,17 +182,77 @@ router.get("/get", auth, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /employee/add:
+ *   post:
+ *     security:
+ *       - Authorization: []
+ *     summary: Add New Employee
+ *     tags: [Employees]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Add'
+ *     responses:
+ *       200:
+ *         description: New Employee will be added.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Add'
+ *       500:
+ *         description: Some server error
+ */
+
 router.post("/add", auth, async (req, res) => {
   try {
     const newEmployee = new Employee(req.body);
     console.log(req.body);
     await newEmployee.save();
-    res.status(200).json({ message: "Employee added successfully" });
+    res
+      .status(200)
+      .json({ message: "Employee added successfully", newEmployee });
   } catch (error) {
     console.error("Error creating a new employee:", error);
     res.status(500).json({ error: "Failed to create a new employee" });
   }
 });
+
+/**
+ * @swagger
+ * /employee/update/{id}:
+ *   put:
+ *     security:
+ *       - Authorization: []
+ *     summary: Fetch all the employees list
+ *     tags: [Employees]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Add'
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           required: true
+ *           description: Id of the employee
+ *     responses:
+ *       200:
+ *         description: Update employee data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Add'
+ *       500:
+ *         description: Some server error
+ */
 
 router.put("/update/:id", auth, async (req, res) => {
   try {
@@ -182,7 +268,7 @@ router.put("/update/:id", auth, async (req, res) => {
     if (updatedEmployee) {
       res.status(200).json({
         message: "Updated Successfully",
-        updated: updatedEmployee,
+        updatedEmployee,
       });
     } else {
       res.status(404).json({ error: "Employee not found" });
@@ -192,12 +278,39 @@ router.put("/update/:id", auth, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /employee/delete/{id}:
+ *   delete:
+ *     security:
+ *       - Authorization: []
+ *     summary: Delete employee by unique id
+ *     tags: [Employees]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           required: true
+ *           description: Id of the employee
+ *     responses:
+ *       200:
+ *         description: Update employee data
+ *         content:
+ *           application/json:
+ *       500:
+ *         description: Some server error
+ */
+
 router.delete("/delete/:id", auth, async (req, res) => {
   try {
     const employeeId = req.params.id;
     const result = await Employee.findByIdAndDelete(employeeId);
     if (result) {
-      res.status(200).json({ message: "Employee deleted successfully" });
+      res
+        .status(200)
+        .json({ message: `Employee deleted successfully for id - ${id}` });
     } else {
       res.status(404).json({ error: "Employee not found" });
     }

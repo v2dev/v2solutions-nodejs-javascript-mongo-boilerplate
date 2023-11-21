@@ -102,9 +102,6 @@ const nodemailer = require("nodemailer");
  *         otp: "123456"
  *         password: "1234567890"
  *         confirmPassword: "1234567890"
- *
- *
- *
  */
 
 /**

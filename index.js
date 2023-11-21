@@ -13,7 +13,7 @@ const options = {
       title: "Backend Boiler plate",
       version: "1.0.0",
       description:
-        "A simple Express Server with SignIn and Sign Up and CRUD Operation on employee table",
+        "Server with SignIn and Sign Up and CRUD Operation on employee table",
     },
     components: {
       securitySchemes: {

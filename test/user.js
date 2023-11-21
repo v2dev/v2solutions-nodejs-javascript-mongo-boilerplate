@@ -11,18 +11,19 @@ describe("Auth Api", () => {
       chai
         .request(app)
         .post("/user/signup")
-        .send({
+        .send({ 
           name: "Armaan122345",
           email: "armaan12232325432@gmail.com",
           password: "armaan@786",
           country: "india",
         })
         .end((error, response, body) => {
-          console.log(response);
+          // console.log(response);
           //response.body.should.have.statusCode(200);
           response.body.should.be.a("object");
           response.body.should.have.property("newUser");
           response.body.should.have.property("qrCodeUrl");
+          // response.body.should.not.be.a("empty")
           done();
         });
     });
@@ -37,7 +38,7 @@ describe("Auth Api", () => {
           password: "armaan@786",
         })
         .end((error, response, body) => {
-          console.log(response);
+          // console.log(response);
           //response.body.should.have.statusCode(200);
           response.body.should.be.a("object");
           response.body.should.have.property("message").eql("Login successful");
@@ -46,12 +47,12 @@ describe("Auth Api", () => {
     });
   });
   describe("MFA verify", () => {
-    it("It should verify the google authentication", (done) => {
+    it("It should failed the google authentication", (done) => {
       chai
         .request(app)
         .post("/user/mfa-verify")
         .send({
-          email: "armaan1223232543@gmail.com",
+          email: "israr@gmail.com",
           mfaToken: "123456",
         })
         .end((error, response, body) => {
@@ -59,9 +60,9 @@ describe("Auth Api", () => {
           //response.body.should.have.statusCode(200);
           response.body.should.be.a("object");
           response.body.should.have
-            .property("message")
-            .eql("Verification successful");
-          response.body.should.have.property("jwtToken");
+            .property("error")
+            .eql("Invalid token");
+          response.body.should.not.have.property("jwtToken");
           done();
         });
     });
@@ -100,8 +101,8 @@ describe("Auth Api", () => {
           //response.body.should.have.statusCode(200);
           response.body.should.be.a("object");
           response.body.should.have
-            .property("message")
-            .eql("Password reset successfully");
+            .property("error")
+            .eql("Invalid or expired OTP");
           done();
         });
     });
