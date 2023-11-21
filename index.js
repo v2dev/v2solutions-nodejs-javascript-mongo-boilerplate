@@ -1,10 +1,12 @@
 const express = require("express");
 const cors = require("cors");
+const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerUI = require("swagger-ui-express");
+
 const UserRoute = require("./routes/user");
 const EmployeeRoute = require("./routes/employee");
+
 const connection = require("./connection");
-const swaggerUI = require("swagger-ui-express");
-const swaggerJsDoc = require("swagger-jsdoc");
 
 const options = {
   definition: {

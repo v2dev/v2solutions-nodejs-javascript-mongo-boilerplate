@@ -1,9 +1,8 @@
 const express = require("express");
-const router = express.Router();
-const jwt = require("jsonwebtoken");
 const auth = require("../services/authentication");
 const Employee = require("../model/Employee");
 
+const router = express.Router();
 /**
  * @swagger
  * components:
@@ -110,17 +109,13 @@ const Employee = require("../model/Employee");
  *           description: It will filter bases on the name column.
  *       - in: query
  *         name: sort
- *         required: true
  *         schema:
  *           type: string
- *           required: true
  *           description: Sorting - 'asc' or 'desc'
  *       - in: query
  *         name: sortedColumn
- *         required: true
  *         schema:
  *           type: string
- *           required: true
  *           description: Column name i.e email, dob, desgination...
  *     responses:
  *       200:

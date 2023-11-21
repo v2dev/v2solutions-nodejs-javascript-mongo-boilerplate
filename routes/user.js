@@ -2,11 +2,12 @@ require("dotenv").config();
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const User = require("../model/User");
-const router = express.Router();
-const speakeasy = require("speakeasy");
-const QRCode = require("qrcode");
 const nodemailer = require("nodemailer");
+const QRCode = require("qrcode");
+const speakeasy = require("speakeasy");
+const User = require("../model/User");
+
+const router = express.Router();
 
 /**
  * @swagger
