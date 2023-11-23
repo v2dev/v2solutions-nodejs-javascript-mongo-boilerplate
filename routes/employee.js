@@ -198,7 +198,7 @@ router.post('/add', auth, addEmployees);
  *   put:
  *     security:
  *       - Authorization: []
- *     summary: Fetch all the employees list
+ *     summary: Update employee by unique id.
  *     tags: [Employees]
  *     requestBody:
  *       required: true
