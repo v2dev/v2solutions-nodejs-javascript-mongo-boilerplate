@@ -31,7 +31,7 @@ The Employee List project is a Node.js-based API allowing users to perform CRUD 
 2. Copy the environment variables file:
 
     ```bash
-    cp .env.example .env
+    cp .env.example  .env
     ```
 
 ## Environment Variables

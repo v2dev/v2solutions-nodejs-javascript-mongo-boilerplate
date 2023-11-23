@@ -1,19 +1,13 @@
-require("dotenv").config();
-const express = require("express");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const nodemailer = require("nodemailer");
-const QRCode = require("qrcode");
-const speakeasy = require("speakeasy");
-const User = require("../model/User");
+require('dotenv').config();
+const express = require('express');
 
 const {
-  loginUser,
-  registerUser,
-  mfaVerifyUser,
-  forgetUser,
-  resetUser,
-} = require("../controllers/AuthController");
+    loginUser,
+    registerUser,
+    mfaVerifyUser,
+    forgetUser,
+    resetUser,
+} = require('../controllers/AuthController');
 
 const router = express.Router();
 
@@ -142,7 +136,7 @@ const router = express.Router();
  *       500:
  *         description: Some server error
  */
-router.post("/login", loginUser);
+router.post('/login', loginUser);
 
 /**
  * @swagger
@@ -166,7 +160,7 @@ router.post("/login", loginUser);
  *       500:
  *         description: Some server error
  */
-router.post("/signup", registerUser);
+router.post('/signup', registerUser);
 
 /**
  * @swagger
@@ -191,7 +185,7 @@ router.post("/signup", registerUser);
  *         description: Some server error
  */
 
-router.post("/mfa-verify", mfaVerifyUser);
+router.post('/mfa-verify', mfaVerifyUser);
 
 /**
  * @swagger
@@ -216,7 +210,7 @@ router.post("/mfa-verify", mfaVerifyUser);
  *         description: Some server error
  */
 
-router.post("/forgot-password", forgetUser);
+router.post('/forgot-password', forgetUser);
 
 /**
  * @swagger
@@ -241,6 +235,6 @@ router.post("/forgot-password", forgetUser);
  *         description: Some server error
  */
 
-router.post("/reset-password", resetUser);
+router.post('/reset-password', resetUser);
 
 module.exports = router;

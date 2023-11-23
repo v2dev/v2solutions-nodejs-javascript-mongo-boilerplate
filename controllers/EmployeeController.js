@@ -1,5 +1,17 @@
 const Employee = require("../model/Employee");
 
+const getEmployeesById = async (req, res) => {
+  try {
+    console.log('hell0');
+    const employeeId = req.params.id;
+    const employee = await Employee.findById(employeeId);
+    res.status(200).json({ employee });
+  } catch (err) {
+    console.error("Error fetching employees :", error);
+    res.status(500).json({ error: "Failed to fetch employees " });
+  }
+};
+
 const getEmployees = async (req, res) => {
   try {
     let { page = 1, limit = 10, sort, filter, sortedColumn } = req.query;
@@ -92,11 +104,9 @@ const deleteEmployee = async (req, res) => {
     const employeeId = req.params.id;
     const result = await Employee.findByIdAndDelete(employeeId);
     if (result) {
-      res
-        .status(200)
-        .json({
-          message: `Employee deleted successfully for id - ${employeeId}`,
-        });
+      res.status(200).json({
+        message: `Employee deleted successfully for id - ${employeeId}`,
+      });
     } else {
       res.status(404).json({ error: "Employee not found" });
     }
@@ -111,4 +121,5 @@ module.exports = {
   addEmployees,
   updateEmployee,
   deleteEmployee,
+  getEmployeesById,
 };

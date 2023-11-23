@@ -1,12 +1,14 @@
-const express = require("express");
-const auth = require("../services/authentication");
-const Employee = require("../model/Employee");
+const express = require('express');
+const auth = require('../services/authentication');
+
+
 const {
-  getEmployees,
-  addEmployees,
-  updateEmployee,
-  deleteEmployee,
-} = require("../controllers/EmployeeController");
+    getEmployees,
+    addEmployees,
+    updateEmployee,
+    deleteEmployee,
+    getEmployeesById
+} = require('../controllers/EmployeeController');
 
 const router = express.Router();
 /**
@@ -134,8 +136,34 @@ const router = express.Router();
  *         description: Some server error
  */
 
-router.get("/get", auth, getEmployees);
-//router.get("/get", auth, EmployeeController);
+router.get('/get', auth, getEmployees);
+
+/**
+ * @swagger
+ * /employee/get/{id}:
+ *   get:
+ *     security:
+ *       - Authorization: []
+ *     summary: Get Employee by unique id.
+ *     tags: [Employees]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           required: true
+ *           description: Id of the employee
+ *     responses:
+ *       200:
+ *         description: Get employee data
+ *         content:
+ *           application/json:
+ *       500:
+ *         description: Some server error
+ */
+
+router.get('/get/:id', auth, getEmployeesById);
 
 /**
  * @swagger
@@ -162,7 +190,7 @@ router.get("/get", auth, getEmployees);
  *         description: Some server error
  */
 
-router.post("/add", auth, addEmployees);
+router.post('/add', auth, addEmployees);
 
 /**
  * @swagger
@@ -197,7 +225,7 @@ router.post("/add", auth, addEmployees);
  *         description: Some server error
  */
 
-router.put("/update/:id", auth, updateEmployee);
+router.put('/update/:id', auth, updateEmployee);
 
 /**
  * @swagger
@@ -224,6 +252,6 @@ router.put("/update/:id", auth, updateEmployee);
  *         description: Some server error
  */
 
-router.delete("/delete/:id", auth, deleteEmployee);
+router.delete('/delete/:id', auth, deleteEmployee);
 
 module.exports = router;

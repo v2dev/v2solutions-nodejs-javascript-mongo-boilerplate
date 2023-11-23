@@ -1,9 +1,33 @@
+require('dotenv').config();
 const chai = require("chai");
 const chaihttp = require("chai-http");
 const app = require("../index");
+const mongoose = require('mongoose')
 
 chai.should();
 chai.use(chaihttp);
+
+
+describe('Access to DB', function(){
+  describe('#pass', function(){
+       it('should connect with correct credentials', (done) => {
+        mongoose
+        .connect(process.env.MONGO_testing_URI, {
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+        })
+        .then((res) => {
+          logger.info("MongoDB testing connected Successfully");
+        })
+        .catch((err) => {
+          logger.error(err.message);
+        });
+        done()
+       });
+   })
+});
+
+
 
 describe("Auth Api", () => {
   describe("Sign up", () => {
@@ -11,21 +35,36 @@ describe("Auth Api", () => {
       chai
         .request(app)
         .post("/user/signup")
-        .send({ 
+        .send({
           name: "Armaan122345",
           email: "armaan12232325432@gmail.com",
           password: "armaan@786",
           country: "india",
         })
         .end((error, response, body) => {
-          // console.log(response);
-          //response.body.should.have.statusCode(200);
           response.body.should.be.a("object");
           response.body.should.have.property("newUser");
           response.body.should.have.property("qrCodeUrl");
-          // response.body.should.not.be.a("empty")
           done();
         });
+      it("It should not register the user when email already exist in system", (done) => {
+        chai
+          .request(app)
+          .post("/user/signup")
+          .send({
+            name: "Armaan122345",
+            email: "armaan12232325432@gmail.com",
+            password: "armaan@786",
+            country: "india",
+          })
+          .end((error, response, body) => {
+            response.body.should.be.a("object");
+            response.body.should.have
+              .property("error")
+              .eql("Email is already register");
+            done();
+          });
+      });
     });
   });
   describe("Sign In", () => {
@@ -34,20 +73,36 @@ describe("Auth Api", () => {
         .request(app)
         .post("/user/login")
         .send({
-          email: "armaan1223232543@gmail.com",
+          email: "armaan12232325432@gmail.com",
           password: "armaan@786",
         })
         .end((error, response, body) => {
-          // console.log(response);
+          // 
           //response.body.should.have.statusCode(200);
           response.body.should.be.a("object");
           response.body.should.have.property("message").eql("Login successful");
           done();
         });
     });
+    it("It should not login the user when entered invalid credential", (done) => {
+      chai
+        .request(app)
+        .post("/user/login")
+        .send({
+          email: "armaan12232325431@gmail.com",
+          password: "armaan@7861",
+        })
+        .end((error, response, body) => {
+          response.body.should.be.a("object");
+          response.body.should.have
+            .property("error")
+            .eql("Invalid credentials");
+          done();
+        });
+    });
   });
   describe("MFA verify", () => {
-    it("It should failed the google authentication", (done) => {
+    it("It should failed the google authentication when entered invalid token", (done) => {
       chai
         .request(app)
         .post("/user/mfa-verify")
@@ -56,12 +111,10 @@ describe("Auth Api", () => {
           mfaToken: "123456",
         })
         .end((error, response, body) => {
-          console.log(response);
+          
           //response.body.should.have.statusCode(200);
           response.body.should.be.a("object");
-          response.body.should.have
-            .property("error")
-            .eql("Invalid token");
+          response.body.should.have.property("error").eql("Invalid token");
           response.body.should.not.have.property("jwtToken");
           done();
         });
@@ -76,7 +129,7 @@ describe("Auth Api", () => {
           email: "afsarshaikh87@gmail.com",
         })
         .end((error, response, body) => {
-          console.log(response);
+          
           //response.body.should.have.statusCode(200);
           response.body.should.be.a("object");
           response.body.should.have
@@ -87,7 +140,7 @@ describe("Auth Api", () => {
     });
   });
   describe("Reset Password", () => {
-    it("It will reset password once enetered valid otp", (done) => {
+    it("It will not reset password when enetered invalid otp", (done) => {
       chai
         .request(app)
         .post("/user/reset-password")
@@ -97,7 +150,7 @@ describe("Auth Api", () => {
           confirmPassword: "aaaaaaaaaaaa",
         })
         .end((error, response, body) => {
-          console.log(response);
+          
           //response.body.should.have.statusCode(200);
           response.body.should.be.a("object");
           response.body.should.have
