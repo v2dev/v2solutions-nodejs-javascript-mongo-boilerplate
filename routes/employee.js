@@ -1,13 +1,12 @@
 const express = require('express');
 const auth = require('../services/authentication');
 
-
 const {
     getEmployees,
     addEmployees,
     updateEmployee,
     deleteEmployee,
-    getEmployeesById
+    getEmployeesById,
 } = require('../controllers/EmployeeController');
 
 const router = express.Router();

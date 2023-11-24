@@ -41,6 +41,9 @@ Create .env file in root directory and Update the `.env` file with the following
 - **MONGO_URI**: Add your MongoDB URI string.
 - **JWT_TOKEN**: Set your JSON Web Token secret.
 - **PORT**: Set your PORT to 8080.
+- **EMAIL_ENCRYPTED**: Provide enctypted value for accessing/sending email.
+- **EMAIL_AUTH_SECRET_KEY**: provide secret key which is used for encryption.
+- **EMAIL**: provide email id from which email will be sent.
 
 ## Setup
 

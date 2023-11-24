@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -5,6 +6,9 @@ const nodemailer = require('nodemailer');
 const QRCode = require('qrcode');
 const speakeasy = require('speakeasy');
 const User = require('../model/User');
+const Cryptr = require('cryptr');
+
+
 
 const loginUser = async (req, res) => {
     try {
@@ -15,7 +19,10 @@ const loginUser = async (req, res) => {
         }
         const matchPassword = await bcrypt.compare(password, user.password);
         if (matchPassword) {
-            res.json({ message: 'Login successful', qrCodeUrl: user.qrCodeUrl });
+            res.json({
+                message: 'Login successful',
+                qrCodeUrl: user.qrCodeUrl,
+            });
         } else {
             res.status(401).json({ error: 'Invalid credentials' });
         }
@@ -30,7 +37,9 @@ const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(userData.password, 10);
         const user = await User.findOne({ email: userData.email });
         if (user) {
-            return res.status(200).json({ error: 'Email is already register.' });
+            return res
+                .status(200)
+                .json({ error: 'Email is already in used.' });
         }
         const mfaSecret = speakeasy.generateSecret({
             length: 20,
@@ -72,11 +81,18 @@ const mfaVerifyUser = async (req, res) => {
         });
         console.log('verified is ', verified);
         if (verified) {
-            const jwtFToken = jwt.sign({ email: user.email }, process.env.JWT_TOKEN, {
-                expiresIn: '20m',
-            });
+            const jwtFToken = jwt.sign(
+                { email: user.email },
+                process.env.JWT_TOKEN,
+                {
+                    expiresIn: '20m',
+                }
+            );
             console.log('token', jwtFToken);
-            res.json({ message: 'Verification successful', jwtToken: jwtFToken });
+            res.json({
+                message: 'Verification successful',
+                jwtToken: jwtFToken,
+            });
         } else {
             res.status(401).json({ error: 'Invalid token' });
         }
@@ -94,22 +110,27 @@ const forgetUser = async (req, res) => {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
+        const resetToken = Math.floor(
+            100000 + Math.random() * 900000
+        ).toString();
         user.resetPasswordToken = resetToken;
         user.resetPasswordExpires = Date.now() + 5 * 60 * 1000; // 5 min expiry
 
         await user.save();
 
+        const cryptr = new Cryptr(process.env.EMAIL_AUTH_SECRET_KEY);
+        let pass = cryptr.decrypt(process.env.EMAIL_ENCRYPTED);
+      
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: 'chinmaybondev2@gmail.com',
-                pass: 'wzjx cfxu gavr wydm',
+                user: process.env.EMAIL,
+                pass,
             },
         });
 
         const mailOptions = {
-            from: 'chinmaybondev2@gmail.com',
+            from: process.env.EMAIL,
             to: email,
             subject: 'Password Reset',
             text: `Hi, Your OTP for password reset is: ${resetToken}`,
