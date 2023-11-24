@@ -2,7 +2,6 @@ const Employee = require('../model/Employee');
 
 const getEmployeesById = async (req, res) => {
     try {
-        console.log('hell0');
         const employeeId = req.params.id;
         const employee = await Employee.findById(employeeId);
         res.status(200).json({ employee });
@@ -63,12 +62,16 @@ const getEmployees = async (req, res) => {
 
 const addEmployees = async (req, res) => {
     try {
-        let {email} = req.body
+        let { email, name, dob, designation, education } = req.body;
+        console.log(name);
+        if (!email || !name || !dob || !designation || !education) {
+            return res.status(200).json({
+                error: 'Please provide all the details to add new employee',
+            });
+        }
         const user = await Employee.findOne({ email });
         if (user) {
-            return res
-                .status(200)
-                .json({ error: 'Email is already in used.' });
+            return res.status(200).json({ error: 'Email is already in used.' });
         }
         const newEmployee = new Employee(req.body);
         console.log(req.body);
