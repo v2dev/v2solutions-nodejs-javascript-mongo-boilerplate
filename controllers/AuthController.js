@@ -104,7 +104,7 @@ const forgetUser = async (req, res) => {
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-
+        // to send otp to email
         const resetToken = Math.floor(
             100000 + Math.random() * 900000
         ).toString();
@@ -112,38 +112,20 @@ const forgetUser = async (req, res) => {
         user.resetPasswordExpires = Date.now() + 5 * 60 * 1000; // 5 min expiry
         await user.save();
 
-        let text= `Hi, Your OTP for password reset is: ${resetToken}`;
-        sendEmail('Password Reset', text, email, res); 
-    } catch (error) {
-        console.error('Error during forgot password:', error);
-        res.status(500).json({ error: 'Forgot password failed' });
-    }
-};
-
-const resetLink = async (req, res) => {
-    try {
-        const { email } = req.body;
-        const user = await User.findOne({ email });
-        console.log(user);
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
         const secret = process.env.JWT_TOKEN + user.password;
         const token = jwt.sign({ email: user.email, id: user._id }, secret, {
             expiresIn: '5m',
         });
         user.token = token;
         await user.save();
-
-        const text = `${process.env.BASE_URL}/reset-password/${token}`;
-        sendEmail('Reset Link', text, email, res); 
+        const text = `You can use OTP to reset password :  ${resetToken} or used link to reset password: ${process.env.BASE_URL}/reset-password/${token}`;
+        await sendEmail('Reset Password', text, email, res); 
     } catch (error) {
-        console.error('Error resetting password:', error);
-        res.status(500).json({ error: 'Failed to reset password' });
+        console.error('Error during forgot password:', error);
+        res.status(500).json({ error: 'Forgot password failed' });
     }
 };
+
 
 const resetUser = async (req, res) => {
     try {
@@ -202,6 +184,5 @@ module.exports = {
     registerUser,
     mfaVerifyUser,
     forgetUser,
-    resetUser,
-    resetLink,
+    resetUser
 };

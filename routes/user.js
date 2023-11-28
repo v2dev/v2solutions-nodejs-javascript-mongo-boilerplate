@@ -6,9 +6,7 @@ const {
     registerUser,
     mfaVerifyUser,
     forgetUser,
-    resetUser,
-    resetLink,
-    resetPassword
+    resetUser
 } = require('../controllers/AuthController');
 
 const router = express.Router();
@@ -200,7 +198,7 @@ router.post('/mfa-verify', mfaVerifyUser);
  * @swagger
  * /user/forgot-password:
  *   post:
- *     summary: To send OTP to registered email id.
+ *     summary: To send OTP and reset link to registered email id.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -220,31 +218,6 @@ router.post('/mfa-verify', mfaVerifyUser);
  */
 
 router.post('/forgot-password', forgetUser);
-
-/**
- * @swagger
- * /user/reset-link:
- *   post:
- *     summary: To send reset link to register email
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Forget'
- *     responses:
- *       200:
- *         description: To reset password
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Forget'
- *       500:
- *         description: Some server error
- */
-
-router.post('/reset-link', resetLink);
 
 /**
  * @swagger
@@ -270,8 +243,5 @@ router.post('/reset-link', resetLink);
  */
 
 router.post('/reset-password', resetUser);
-
-
-
 
 module.exports = router;
