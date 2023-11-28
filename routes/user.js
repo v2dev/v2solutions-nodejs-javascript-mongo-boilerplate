@@ -7,6 +7,8 @@ const {
     mfaVerifyUser,
     forgetUser,
     resetUser,
+    resetLink,
+    resetPassword
 } = require('../controllers/AuthController');
 
 const router = express.Router();
@@ -89,19 +91,26 @@ const router = express.Router();
  *       type: object
  *       required:
  *         - otp
+ *         - token
  *         - password
  *         - confirmPassword
  *       properties:
+ *         token:
+ *           type: integer
+ *           description: token send to registered email id.
  *         otp:
  *           type: integer
  *           description: 6 digit otp sent to email
  *         password:
+ *           required: true
  *           type: string
  *           description: new password
  *         confirmPassword:
+ *           required: true
  *           type: string
  *           description: confirm password
  *       example:
+ *         token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFmc2Fyc2hhaWtoODdAZ21haWwuY29tIiwiaWQiOiI2NTU1ZGY0YjIyMTM0YTk2ZDU3N2ZjM2EiLCJpYXQiOjE3MDEwNzgwMjQsImV4cCI6MTcwMTA3ODMyNH0.2BiVsPLoe9IZHv-QeCNBP8HhC8rJg8U1TR6J4420Cx8111"
  *         otp: "123456"
  *         password: "1234567890"
  *         confirmPassword: "1234567890"
@@ -191,7 +200,7 @@ router.post('/mfa-verify', mfaVerifyUser);
  * @swagger
  * /user/forgot-password:
  *   post:
- *     summary: Forget password.
+ *     summary: To send OTP to registered email id.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -214,9 +223,34 @@ router.post('/forgot-password', forgetUser);
 
 /**
  * @swagger
+ * /user/reset-link:
+ *   post:
+ *     summary: To send reset link to register email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Forget'
+ *     responses:
+ *       200:
+ *         description: To reset password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Forget'
+ *       500:
+ *         description: Some server error
+ */
+
+router.post('/reset-link', resetLink);
+
+/**
+ * @swagger
  * /user/reset-password:
  *   post:
- *     summary: Reset password.
+ *     summary: To verify OTP and Token recieved from user.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -236,5 +270,8 @@ router.post('/forgot-password', forgetUser);
  */
 
 router.post('/reset-password', resetUser);
+
+
+
 
 module.exports = router;
