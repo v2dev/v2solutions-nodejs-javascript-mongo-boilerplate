@@ -5,7 +5,8 @@ const bcrypt = require('bcryptjs');
 const QRCode = require('qrcode');
 const speakeasy = require('speakeasy');
 const User = require('../model/User');
-const {sendEmail} = require('../utils/email/sendEmail');
+const uuid  =  require('uuid');
+const { sendEmail } = require('../utils/email/sendEmail');
 
 const loginUser = async (req, res) => {
     try {
@@ -102,30 +103,24 @@ const forgetUser = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(200).json({ error: 'User not found' });
         }
-        // to send otp to email
         const resetToken = Math.floor(
             100000 + Math.random() * 900000
         ).toString();
         user.resetPasswordToken = resetToken;
         user.resetPasswordExpires = Date.now() + 5 * 60 * 1000; // 5 min expiry
         await user.save();
-
-        const secret = process.env.JWT_TOKEN + user.password;
-        const token = jwt.sign({ email: user.email, id: user._id }, secret, {
-            expiresIn: '5m',
-        });
+        let token =  uuid.v4();
         user.token = token;
         await user.save();
-        const text = `You can use OTP to reset password :  ${resetToken} or used link to reset password: ${process.env.BASE_URL}/reset-password/${token}`;
-        await sendEmail('Reset Password', text, email, res); 
+        const text = `You can use OTP to reset password :  <b>${resetToken}</b> or used link to reset password: <b>${process.env.BASE_URL}/reset-password/${token}</b>`;
+        await sendEmail('Reset Password', text, email, res);
     } catch (error) {
         console.error('Error during forgot password:', error);
         res.status(500).json({ error: 'Forgot password failed' });
     }
 };
-
 
 const resetUser = async (req, res) => {
     try {
@@ -134,25 +129,23 @@ const resetUser = async (req, res) => {
         console.log(token);
 
         if (password !== confirmPassword) {
-            return res.status(400).json({ error: 'Passwords do not match' });
+            return res.status(422).json({ error: 'Passwords do not match' });
         }
         if (token) {
             if (!password || !confirmPassword) {
                 return res
-                    .status(400)
+                    .status(422)
                     .json({ error: 'Please provide password' });
             }
             user = await User.findOne({ token });
             if (!user) {
-                return res.status(404).json({ error: 'Invalid token' });
+                return res.status(422).json({ error: 'Invalid token' });
             }
-            const secret = process.env.JWT_TOKEN + user.password;
-            jwt.verify(token, secret, (err, data) => {
-                if (err) {
-                    console.error('JWT Verification Error:', err);
-                     res.status(404).json({ error: 'Invalid token' });
-                }
-            });
+            user = await User.findOne({ token });
+            if (!user) {
+                console.error('Toen issue:', err);
+                res.status(422).json({ error: 'Invalid token' });
+            }
         } else if (otp) {
             if (!otp || !password || !confirmPassword) {
                 return res
@@ -162,7 +155,7 @@ const resetUser = async (req, res) => {
             user = await User.findOne({ resetPasswordToken: otp });
             if (!user || user.resetPasswordExpires < Date.now()) {
                 return res
-                    .status(404)
+                    .status(422)
                     .json({ error: 'Invalid or expired OTP' });
             }
         }
@@ -184,5 +177,5 @@ module.exports = {
     registerUser,
     mfaVerifyUser,
     forgetUser,
-    resetUser
+    resetUser,
 };

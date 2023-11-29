@@ -4,6 +4,9 @@ const getEmployeesById = async (req, res) => {
     try {
         const employeeId = req.params.id;
         const employee = await Employee.findById(employeeId);
+        if (!employee) {
+            return res.status(200).json({ message: 'Id not found' });
+        }
         res.status(200).json({ employee });
     } catch (err) {
         console.error('Error fetching employees :', err);
@@ -103,7 +106,7 @@ const updateEmployee = async (req, res) => {
                 updatedEmployee,
             });
         } else {
-            res.status(404).json({ error: 'Employee not found' });
+            res.status(500).json({ error: 'Employee not found' });
         }
     } catch (error) {
         res.status(500).json({ message: 'Something went Wrong' });
@@ -119,7 +122,7 @@ const deleteEmployee = async (req, res) => {
                 message: `Employee deleted successfully for id - ${employeeId}`,
             });
         } else {
-            res.status(404).json({ error: 'Employee not found' });
+            res.status(500).json({ error: 'Employee not found' });
         }
     } catch (error) {
         console.error('Error deleting a employee:', error);
