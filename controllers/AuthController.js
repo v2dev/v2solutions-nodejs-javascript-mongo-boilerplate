@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const QRCode = require('qrcode');
 const speakeasy = require('speakeasy');
 const User = require('../model/User');
-const uuid  =  require('uuid');
+const uuid = require('uuid');
 const { sendEmail } = require('../utils/email/sendEmail');
 
 const loginUser = async (req, res) => {
@@ -31,21 +31,26 @@ const loginUser = async (req, res) => {
 };
 const registerUser = async (req, res) => {
     try {
-        const userData = req.body;
-        const hashedPassword = await bcrypt.hash(userData.password, 10);
+        const { name, email, password, country } = req.body;
+        if (!email || !name || !password || !country) {
+            return res.status(422).json({
+                error: 'Please provide all the details to register an user',
+            });
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
         const user = await User.findOne({ email: userData.email });
         if (user) {
-            return res.status(200).json({ error: 'Email is already in used.' });
+            return res.status(422).json({ error: 'Email is already in used.' });
         }
         const mfaSecret = speakeasy.generateSecret({
             length: 20,
             name: 'employee-manager',
         });
         const newUser = new User({
-            name: userData.name,
-            email: userData.email,
+            name,
+            email,
             password: hashedPassword,
-            country: userData.country,
+            country,
             mfaSecret: mfaSecret.base32,
         });
 
@@ -103,7 +108,7 @@ const forgetUser = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(200).json({ error: 'User not found' });
+            return res.status(422).json({ error: 'User not found' });
         }
         const resetToken = Math.floor(
             100000 + Math.random() * 900000
@@ -111,7 +116,7 @@ const forgetUser = async (req, res) => {
         user.resetPasswordToken = resetToken;
         user.resetPasswordExpires = Date.now() + 5 * 60 * 1000; // 5 min expiry
         await user.save();
-        let token =  uuid.v4();
+        let token = uuid.v4();
         user.token = token;
         await user.save();
         const text = `You can use OTP to reset password :  <b>${resetToken}</b> or used link to reset password: <b>${process.env.BASE_URL}/reset-password/${token}</b>`;

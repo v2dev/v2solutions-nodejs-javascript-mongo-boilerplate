@@ -1,11 +1,12 @@
 const Employee = require('../model/Employee');
+const moment = require('moment');
 
 const getEmployeesById = async (req, res) => {
     try {
         const employeeId = req.params.id;
         const employee = await Employee.findById(employeeId);
         if (!employee) {
-            return res.status(200).json({ message: 'Id not found' });
+            return res.status(422).json({ error: 'Id not found' });
         }
         res.status(200).json({ employee });
     } catch (err) {
@@ -68,16 +69,17 @@ const addEmployees = async (req, res) => {
         let { email, name, dob, designation, education } = req.body;
         console.log(name);
         if (!email || !name || !dob || !designation || !education) {
-            return res.status(200).json({
+            return res.status(422).json({
                 error: 'Please provide all the details to add new employee',
             });
         }
         const user = await Employee.findOne({ email });
         if (user) {
-            return res.status(200).json({ error: 'Email is already in used.' });
+            return res.status(422).json({ error: 'Email is already in used.' });
         }
+
         const newEmployee = new Employee(req.body);
-        console.log(req.body);
+
         await newEmployee.save();
         res.status(200).json({
             message: 'Employee added successfully',
