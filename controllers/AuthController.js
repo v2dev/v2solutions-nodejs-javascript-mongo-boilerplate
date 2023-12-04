@@ -29,6 +29,7 @@ const loginUser = async (req, res) => {
         res.status(500).json({ error: 'Login failed' });
     }
 };
+
 const registerUser = async (req, res) => {
     try {
         const { name, email, password, country } = req.body;
@@ -38,7 +39,7 @@ const registerUser = async (req, res) => {
             });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.findOne({ email: userData.email });
+        const user = await User.findOne({ email });
         if (user) {
             return res.status(422).json({ error: 'Email is already in used.' });
         }
