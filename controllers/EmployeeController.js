@@ -5,11 +5,11 @@ const status = require('../utils/constant')
 const getEmployeesById = async (req, res) => {
     try {
         const employeeId = req.params.id;
-        const employee = await Employee.findById(employeeId);
-        if (!employee) {
+        const data = await Employee.findById(employeeId);
+        if (!data) {
             return res.status(status.unprocess).json({ error: 'Id not found' });
         }
-        res.status(status.success).json({ employee });
+        res.status(status.success).json({ data });
     } catch (err) {
         console.error('Error fetching employees :', err);
         res.status(status.internal_server).json({ error: 'Failed to fetch employees ' });
@@ -21,7 +21,7 @@ const getEmployees = async (req, res) => {
         let { page, limit, sort, filter, sortedColumn } = req.query;
         if (!page && !limit) {
             const data = await Employee.find();
-            console.log('inside get' + employees);
+            console.log('inside get' + data);
             return res.status(status.success).json(data);
         }
         page = parseInt(page);
