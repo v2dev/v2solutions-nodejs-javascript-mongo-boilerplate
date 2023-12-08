@@ -16,9 +16,9 @@ const loginUser = async (req, res) => {
         if (!user) {
             return res.status(status.unauzorized).json({ error: 'Invalid credentials' });
         }
-        if(!user.verified) {
-            return res.status(status.unauzorized).json({ error: 'Please verify your email to login' });
-        }
+        // if(!user.verified) {
+        //     return res.status(status.unauzorized).json({ error: 'Please verify your email to login' });
+        // }
         const matchPassword = await bcrypt.compare(password, user.password);
         if (matchPassword) {
             res.json({
@@ -38,38 +38,33 @@ const registerUser = async (req, res) => {
     try {
         const { name, email, password, country } = req.body;
         if (!email || !name || !password || !country) {
-            return res.status(status.unprocess).json({
+            return res.status(422).json({
                 error: 'Please provide all the details to register an user',
             });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await User.findOne({ email });
         if (user) {
-            return res.status(status.unprocess).json({ error: 'Email is already in used.' });
+            return res.status(422).json({ error: 'Email is already in used.' });
         }
-
+        const mfaSecret = speakeasy.generateSecret({
+            length: 20,
+            name: 'employee-manager',
+        });
         const newUser = new User({
             name,
             email,
             password: hashedPassword,
             country,
-            isVerified: false,
+            mfaSecret: mfaSecret.base32,
         });
-        let data = await newUser.save();
-        console.log(data);
-        let text = `Please click on link to verify your email ${process.env.BASE_URL}/verifyEmail/${data._id}`;
-        let params = {
-            subject: 'Verification Link',
-            text,
-            email
-        }
-        await sendEmail(params, res);
-        res.status(status.success).json({
-            message:
-                'Your registration has been successfully.Please verify your email',
-        });
+
+        await newUser.save();
+
+        const qrCode = await QRCode.toDataURL(mfaSecret.otpauth_url);
+        res.status(200).json({ newUser, qrCodeUrl: qrCode });
     } catch (error) {
-        res.status(status.internal_server).json({ error: 'Failed to create a new user' });
+        res.status(500).json({ error: 'Failed to create a new user' });
     }
 };
 

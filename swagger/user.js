@@ -257,7 +257,12 @@ router.get('/google/callback',
   function(req, res) {
     console.log(req.user)
     // Successful authentication, redirect home.
-    res.redirect('http://localhost:4200/dashboard');
+    res.send(req.user);
+    res.redirect('/dashboard')
   });
+
+// router.get('/success' , (req,res) => {
+//   res.send(req.user)
+// })
 
 module.exports = router;
