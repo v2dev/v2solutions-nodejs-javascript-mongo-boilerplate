@@ -88,7 +88,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /get:
+ * /employees:
  *   get:
  *     security:
  *       - Authorization: []
@@ -131,11 +131,11 @@ const router = express.Router();
  *         description: Some server error
  */
 
-router.get('/get', auth, getEmployees);
+router.get('/employees', auth, getEmployees);
 
 /**
  * @swagger
- * /get/{id}:
+ * /employees/{id}:
  *   get:
  *     security:
  *       - Authorization: []
@@ -158,11 +158,11 @@ router.get('/get', auth, getEmployees);
  *         description: Some server error
  */
 
-router.get('/get/:id', auth, getEmployeesById);
+router.get('/employees/:id', auth, getEmployeesById);
 
 /**
  * @swagger
- * /add:
+ * /employees:
  *   post:
  *     security:
  *       - Authorization: []
@@ -185,11 +185,11 @@ router.get('/get/:id', auth, getEmployeesById);
  *         description: Some server error
  */
 
-router.post('/add', auth, addEmployees);
+router.post('/employees', auth, addEmployees);
 
 /**
  * @swagger
- * /update/{id}:
+ * /employees/{id}:
  *   put:
  *     security:
  *       - Authorization: []
@@ -220,11 +220,11 @@ router.post('/add', auth, addEmployees);
  *         description: Some server error
  */
 
-router.put('/update/:id', auth, updateEmployee);
+router.put('/employees/:id', auth, updateEmployee);
 
 /**
  * @swagger
- * /delete/{id}:
+ * /employees/{id}:
  *   delete:
  *     security:
  *       - Authorization: []
@@ -247,6 +247,6 @@ router.put('/update/:id', auth, updateEmployee);
  *         description: Some server error
  */
 
-router.delete('/delete/:id', auth, deleteEmployee);
+router.delete('/employees/:id', auth, deleteEmployee);
 
 module.exports = router;
