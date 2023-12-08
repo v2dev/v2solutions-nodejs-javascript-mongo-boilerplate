@@ -115,7 +115,7 @@ const mfaVerifyUser = async (req, res) => {
                 { email: user.email },
                 process.env.JWT_TOKEN,
                 {
-                    expiresIn: '20m',
+                    expiresIn: '2h',
                 }
             );
             console.log('token', jwtFToken);
