@@ -38,7 +38,7 @@ const router = express.Router();
  *           description: Provide 'asc' and 'desc'
  *         filter:
  *           type: string
- *           description: It will filter the data i.e search
+ *           description: Pass value which need to searched.
  *       example:
  *           sortedColumn: name,
  *           limit: 5,
@@ -47,7 +47,7 @@ const router = express.Router();
  *           sort: desc,
  *           filter: afsar,
  *
- *     Add:
+ *     AddEmployee:
  *       type: object
  *       required:
  *         - name
@@ -88,7 +88,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /employee/get:
+ * /get:
  *   get:
  *     security:
  *       - Authorization: []
@@ -97,17 +97,13 @@ const router = express.Router();
  *     parameters:
  *       - in: query
  *         name: limit
- *         required: true
  *         schema:
  *           type: integer
- *           required: true
  *           description: limit the docs
  *       - in: query
  *         name: page
- *         required: true
  *         schema:
  *           type: integer
- *           required: true
  *           description: Number of pages
  *       - in: query
  *         name: filter
@@ -139,7 +135,7 @@ router.get('/get', auth, getEmployees);
 
 /**
  * @swagger
- * /employee/get/{id}:
+ * /get/{id}:
  *   get:
  *     security:
  *       - Authorization: []
@@ -166,7 +162,7 @@ router.get('/get/:id', auth, getEmployeesById);
 
 /**
  * @swagger
- * /employee/add:
+ * /add:
  *   post:
  *     security:
  *       - Authorization: []
@@ -177,14 +173,14 @@ router.get('/get/:id', auth, getEmployeesById);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Add'
+ *             $ref: '#/components/schemas/AddEmployee'
  *     responses:
  *       200:
  *         description: New Employee will be added.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Add'
+ *               $ref: '#/components/schemas/AddEmployee'
  *       500:
  *         description: Some server error
  */
@@ -193,7 +189,7 @@ router.post('/add', auth, addEmployees);
 
 /**
  * @swagger
- * /employee/update/{id}:
+ * /update/{id}:
  *   put:
  *     security:
  *       - Authorization: []
@@ -204,7 +200,7 @@ router.post('/add', auth, addEmployees);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Add'
+ *             $ref: '#/components/schemas/AddEmployee'
  *     parameters:
  *       - in: path
  *         name: id
@@ -219,7 +215,7 @@ router.post('/add', auth, addEmployees);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Add'
+ *               $ref: '#/components/schemas/AddEmployee'
  *       500:
  *         description: Some server error
  */
@@ -228,7 +224,7 @@ router.put('/update/:id', auth, updateEmployee);
 
 /**
  * @swagger
- * /employee/delete/{id}:
+ * /delete/{id}:
  *   delete:
  *     security:
  *       - Authorization: []

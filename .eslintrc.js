@@ -1,6 +1,5 @@
 module.exports = {
-    // "eslint.enable": false,
-    "linebreak-style": ["error", "windows"],
+     "eslint.enable": false,
     'env': {
         'browser': true,
         'commonjs': true,

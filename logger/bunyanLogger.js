@@ -5,6 +5,15 @@ const moment = require("moment");
 
 const env = process.env.NODE_ENV || "development";
 
+const loglevels = {
+  ERROR: 'error',
+  WARN: 'warn',
+  INFO: 'info',
+  VERBOSE: 'verbose',
+  DEBUG: 'debug',
+  SILLY: 'silly'
+};
+
 function Ec_Service_call(req) {
   return {
     v2_function: req.functionName || "V2BackEnd",
@@ -16,7 +25,7 @@ function Ec_Service_call(req) {
 }
 
 const logger = bunyan.createLogger({
-  name: "NodeJS boilerplate accelerator",
+  name: "Backend",
   application: "log",
   app_env: env,
   serializers: {
@@ -25,16 +34,20 @@ const logger = bunyan.createLogger({
   streams: [
     {
       stream: process.stdout,
-      level: "debug",
+      level: loglevels.DEBUG,
     },
     {
       stream: process.stdout,
-      level: "error",
+      level: loglevels.WARN,
     },
     {
       stream: process.stdout,
-      level: "info",
+      level: loglevels.ERROR,
     },
+    {
+      stream: process.stdout,
+      level: loglevels.INFO,
+    }
   ],
 });
 

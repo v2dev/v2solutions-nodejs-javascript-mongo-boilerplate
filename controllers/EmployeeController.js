@@ -1,23 +1,29 @@
 const Employee = require('../model/Employee');
 const moment = require('moment');
+const status = require('../utils/constant')
 
 const getEmployeesById = async (req, res) => {
     try {
         const employeeId = req.params.id;
         const employee = await Employee.findById(employeeId);
         if (!employee) {
-            return res.status(422).json({ error: 'Id not found' });
+            return res.status(status.unprocess).json({ error: 'Id not found' });
         }
-        res.status(200).json({ employee });
+        res.status(status.success).json({ employee });
     } catch (err) {
         console.error('Error fetching employees :', err);
-        res.status(500).json({ error: 'Failed to fetch employees ' });
+        res.status(status.internal_server).json({ error: 'Failed to fetch employees ' });
     }
 };
 
 const getEmployees = async (req, res) => {
     try {
-        let { page = 1, limit = 10, sort, filter, sortedColumn } = req.query;
+        let { page, limit, sort, filter, sortedColumn } = req.query;
+        if (!page && !limit) {
+            const data = await Employee.find();
+            console.log('inside get' + employees);
+            return res.status(status.success).json(data);
+        }
         page = parseInt(page);
         limit = parseInt(limit);
         let query = {};
@@ -45,13 +51,13 @@ const getEmployees = async (req, res) => {
         const totalEmployees = await Employee.countDocuments(query);
         const totalPages = Math.ceil(totalEmployees / limit);
 
-        const employees = await Employee.find(query)
+        const data = await Employee.find(query)
             .sort(sortOption)
             .limit(limit)
             .skip((page - 1) * limit);
 
-        res.status(200).json({
-            employees,
+        res.status(status.success).json({
+            data,
             page,
             totalPages,
             totalEmployees,
@@ -60,7 +66,7 @@ const getEmployees = async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching employees :', error);
-        res.status(500).json({ error: 'Failed to fetch employees ' });
+        res.status(status.internal_server).json({ error: 'Failed to fetch employees ' });
     }
 };
 
@@ -69,25 +75,25 @@ const addEmployees = async (req, res) => {
         let { email, name, dob, designation, education } = req.body;
         console.log(name);
         if (!email || !name || !dob || !designation || !education) {
-            return res.status(422).json({
+            return res.status(status.unprocess).json({
                 error: 'Please provide all the details to add new employee',
             });
         }
         const user = await Employee.findOne({ email });
         if (user) {
-            return res.status(422).json({ error: 'Email is already in used.' });
+            return res.status(status.unprocess).json({ error: 'Email is already in used.' });
         }
 
         const newEmployee = new Employee(req.body);
 
         await newEmployee.save();
-        res.status(200).json({
+        res.status(status.success).json({
             message: 'Employee added successfully',
             newEmployee,
         });
     } catch (error) {
         console.error('Error creating a new employee:', error);
-        res.status(500).json({ error: 'Failed to create a new employee' });
+        res.status(status.internal_server).json({ error: 'Failed to create a new employee' });
     }
 };
 
@@ -103,15 +109,15 @@ const updateEmployee = async (req, res) => {
             }
         );
         if (updatedEmployee) {
-            res.status(200).json({
+            res.status(status.success).json({
                 message: 'Updated Successfully',
                 updatedEmployee,
             });
         } else {
-            res.status(500).json({ error: 'Employee not found' });
+            res.status(status.internal_server).json({ error: 'Employee not found' });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Something went Wrong' });
+        res.status(status.internal_server).json({ message: 'Something went Wrong' });
     }
 };
 
@@ -120,15 +126,15 @@ const deleteEmployee = async (req, res) => {
         const employeeId = req.params.id;
         const result = await Employee.findByIdAndDelete(employeeId);
         if (result) {
-            res.status(200).json({
+            res.status(status.success).json({
                 message: `Employee deleted successfully for id - ${employeeId}`,
             });
         } else {
-            res.status(500).json({ error: 'Employee not found' });
+            res.status(status.internal_server).json({ error: 'Employee not found' });
         }
     } catch (error) {
         console.error('Error deleting a employee:', error);
-        res.status(500).json({ error: 'Failed to delete a employee' });
+        res.status(status.internal_server).json({ error: 'Failed to delete a employee' });
     }
 };
 

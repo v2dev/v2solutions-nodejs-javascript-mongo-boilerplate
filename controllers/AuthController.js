@@ -7,13 +7,17 @@ const speakeasy = require('speakeasy');
 const User = require('../model/User');
 const uuid = require('uuid');
 const { sendEmail } = require('../utils/email/sendEmail');
+const status = require('../utils/constant')
 
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(status.unauzorized).json({ error: 'Invalid credentials' });
+        }
+        if(!user.verified) {
+            return res.status(status.unauzorized).json({ error: 'Please verify your email to login' });
         }
         const matchPassword = await bcrypt.compare(password, user.password);
         if (matchPassword) {
@@ -22,11 +26,11 @@ const loginUser = async (req, res) => {
                 qrCodeUrl: user.qrCodeUrl,
             });
         } else {
-            res.status(401).json({ error: 'Invalid credentials' });
+            res.status(status.unauzorized).json({ error: 'Invalid credentials' });
         }
     } catch (error) {
         console.error('Error during login:', error);
-        res.status(500).json({ error: 'Login failed' });
+        res.status(status.internal_server).json({ error: 'Login failed' });
     }
 };
 
@@ -34,41 +38,70 @@ const registerUser = async (req, res) => {
     try {
         const { name, email, password, country } = req.body;
         if (!email || !name || !password || !country) {
-            return res.status(422).json({
+            return res.status(status.unprocess).json({
                 error: 'Please provide all the details to register an user',
             });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await User.findOne({ email });
         if (user) {
-            return res.status(422).json({ error: 'Email is already in used.' });
+            return res.status(status.unprocess).json({ error: 'Email is already in used.' });
         }
-        const mfaSecret = speakeasy.generateSecret({
-            length: 20,
-            name: 'employee-manager',
-        });
+
         const newUser = new User({
             name,
             email,
             password: hashedPassword,
             country,
-            mfaSecret: mfaSecret.base32,
+            isVerified: false,
         });
-
-        await newUser.save();
-
-        const qrCode = await QRCode.toDataURL(mfaSecret.otpauth_url);
-        res.status(200).json({ newUser, qrCodeUrl: qrCode });
+        let data = await newUser.save();
+        console.log(data);
+        let text = `Please click on link to verify your email ${process.env.BASE_URL}/verifyEmail/${data._id}`;
+        let params = {
+            subject: 'Verification Link',
+            text,
+            email
+        }
+        await sendEmail(params, res);
+        res.status(status.success).json({
+            message:
+                'Your registration has been successfully.Please verify your email',
+        });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create a new user' });
+        res.status(status.internal_server).json({ error: 'Failed to create a new user' });
     }
 };
+
+const validateEmail = async (req, res) => {
+    try {
+        const { id } = req.body;
+
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(status.unprocess).json({ error: 'Verification is expired' });
+        }
+        const mfaSecret = speakeasy.generateSecret({
+            length: 20,
+            name: 'employee-manager',
+        });
+        user.isVerified = true;
+        user.mfaSecret = mfaSecret.base32;
+        let newUser = await user.save();
+        console.log(newUser);
+        const qrCode = await QRCode.toDataURL(mfaSecret.otpauth_url);
+        res.status(status.success).json({ newUser, qrCodeUrl: qrCode });
+    } catch (error) {
+        res.status(status.internal_server).json({ error: 'Failed to create a new user' });
+    }
+};
+
 const mfaVerifyUser = async (req, res) => {
     try {
         const { email, mfaToken } = req.body;
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(status.unauzorized).json({ error: 'Invalid credentials' });
         }
         const token = speakeasy.totp({
             secret: user.mfaSecret,
@@ -96,11 +129,11 @@ const mfaVerifyUser = async (req, res) => {
                 jwtToken: jwtFToken,
             });
         } else {
-            res.status(401).json({ error: 'Invalid token' });
+            res.status(status.unauzorized).json({ error: 'Invalid token' });
         }
     } catch (errorundefined) {
         console.error('Error during verification:', errorundefined);
-        res.status(500).json({ error: 'Verification failed' });
+        res.status(status.internal_server).json({ error: 'Verification failed' });
     }
 };
 const forgetUser = async (req, res) => {
@@ -109,7 +142,7 @@ const forgetUser = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(422).json({ error: 'User not found' });
+            return res.status(status.unprocess).json({ error: 'User not found' });
         }
         const resetToken = Math.floor(
             100000 + Math.random() * 900000
@@ -121,10 +154,15 @@ const forgetUser = async (req, res) => {
         user.token = token;
         await user.save();
         const text = `You can use OTP to reset password :  <b>${resetToken}</b> or used link to reset password: <b>${process.env.BASE_URL}/reset-password/${token}</b>`;
-        await sendEmail('Reset Password', text, email, res);
+        let params = {
+            subject: 'Reset Password',
+            text,
+            email
+        }
+        await sendEmail(params, res);
     } catch (error) {
         console.error('Error during forgot password:', error);
-        res.status(500).json({ error: 'Forgot password failed' });
+        res.status(status.internal_server).json({ error: 'Forgot password failed' });
     }
 };
 
@@ -135,33 +173,33 @@ const resetUser = async (req, res) => {
         console.log(token);
 
         if (password !== confirmPassword) {
-            return res.status(422).json({ error: 'Passwords do not match' });
+            return res.status(status.unprocess).json({ error: 'Passwords do not match' });
         }
         if (token) {
             if (!password || !confirmPassword) {
                 return res
-                    .status(422)
+                    .status(status.unprocess)
                     .json({ error: 'Please provide password' });
             }
             user = await User.findOne({ token });
             if (!user) {
-                return res.status(422).json({ error: 'Invalid token' });
+                return res.status(status.unprocess).json({ error: 'Invalid token' });
             }
             user = await User.findOne({ token });
             if (!user) {
                 console.error('Toen issue:', err);
-                res.status(422).json({ error: 'Invalid token' });
+                res.status(status.unprocess).json({ error: 'Invalid token' });
             }
         } else if (otp) {
             if (!otp || !password || !confirmPassword) {
                 return res
-                    .status(400)
+                    .status(status.bad_request)
                     .json({ error: 'Please provide password' });
             }
             user = await User.findOne({ resetPasswordToken: otp });
             if (!user || user.resetPasswordExpires < Date.now()) {
                 return res
-                    .status(422)
+                    .status(status.unprocess)
                     .json({ error: 'Invalid or expired OTP' });
             }
         }
@@ -171,10 +209,10 @@ const resetUser = async (req, res) => {
         user.resetPasswordExpires = undefined;
         user.token = undefined;
         await user.save();
-        res.status(200).json({ message: 'Password reset successfully' });
+        res.status(status.success).json({ message: 'Password reset successfully' });
     } catch (error) {
         console.error('Error resetting password:', error);
-        res.status(500).json({ error: 'Failed to reset password' });
+        res.status(status.internal_server).json({ error: 'Failed to reset password' });
     }
 };
 
@@ -184,4 +222,5 @@ module.exports = {
     mfaVerifyUser,
     forgetUser,
     resetUser,
+    validateEmail,
 };

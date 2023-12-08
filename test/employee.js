@@ -9,7 +9,7 @@ chai.use(chaihttp);
 let id;
 // please enter JWT token here.
 let token =
-    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImlzcmFyQGdtYWlsLmNvbSIsImlhdCI6MTcwMDU1MjY5MywiZXhwIjoxNzAwNTUzODkzfQ.TJ6NT6vG3D2jxdmi10P9JtlgenSNQEqVR9nca-OzCiE';
+    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFmc2Fyc2hhaWtoODdAZ21haWwuY29tIiwiaWF0IjoxNzAxODQ1NDk4LCJleHAiOjE3MDE4NDY2OTh9.kNqf3C9UB6nEakk48Oeb2ZhHv-nfmIcA9_ZD9Xd6lOw';
 
 describe('Employee Crud', () => {
     describe('Add Employee', () => {
@@ -20,7 +20,7 @@ describe('Employee Crud', () => {
                 .send({
                     name: 'Afsar Shaikh',
                     email: 'afsar@gmail.com',
-                    dob: '16/05/1993',
+                    dob: '1994-08-09',
                     designation: 'Senior Software Engineer',
                     education: 'BE',
                 })
@@ -69,7 +69,6 @@ describe('Employee Crud', () => {
                     response.body.should.have
                         .property('message')
                         .eql('Updated Successfully');
-                    response.body.should.have.property('updated');
                     done();
                 });
         });

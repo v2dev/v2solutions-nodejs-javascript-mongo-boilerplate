@@ -1,12 +1,14 @@
 require('dotenv').config();
 const express = require('express');
+const passport = require('passport')
 
 const {
     loginUser,
     registerUser,
     mfaVerifyUser,
     forgetUser,
-    resetUser
+    resetUser,
+    validateEmail
 } = require('../controllers/AuthController');
 
 const router = express.Router();
@@ -123,7 +125,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /user/login:
+ * /login:
  *   post:
  *     summary: Login
  *     tags: [Auth]
@@ -147,7 +149,7 @@ router.post('/login', loginUser);
 
 /**
  * @swagger
- * /user/signup:
+ * /signup:
  *   post:
  *     summary: Register
  *     tags: [Auth]
@@ -169,9 +171,11 @@ router.post('/login', loginUser);
  */
 router.post('/signup', registerUser);
 
+router.post('/validateEmail', validateEmail);
+
 /**
  * @swagger
- * /user/mfa-verify:
+ * /mfa-verify:
  *   post:
  *     summary: Authenticate user by google authenticator app
  *     tags: [Auth]
@@ -196,7 +200,7 @@ router.post('/mfa-verify', mfaVerifyUser);
 
 /**
  * @swagger
- * /user/forgot-password:
+ * /forgot-password:
  *   post:
  *     summary: To send OTP and reset link to registered email id.
  *     tags: [Auth]
@@ -221,7 +225,7 @@ router.post('/forgot-password', forgetUser);
 
 /**
  * @swagger
- * /user/reset-password:
+ * /reset-password:
  *   post:
  *     summary: To verify OTP and Token recieved from user.
  *     tags: [Auth]
@@ -243,5 +247,17 @@ router.post('/forgot-password', forgetUser);
  */
 
 router.post('/reset-password', resetUser);
+
+
+router.get('/google',
+  passport.authenticate('google', { scope: ['profile'] }));
+
+router.get('/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
+    console.log(req.user)
+    // Successful authentication, redirect home.
+    res.redirect('http://localhost:4200/dashboard');
+  });
 
 module.exports = router;

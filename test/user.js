@@ -33,9 +33,9 @@ describe('Auth Api', () => {
             chai.request(app)
                 .post('/user/signup')
                 .send({
-                    name: 'Armaan122345',
-                    email: 'armaan12232325432@gmail.com',
-                    password: 'armaan@786',
+                    name: 'Afsar Shaikh',
+                    email: 'afsarshaikh87@gmail.com',
+                    password: 'Umair@786786',
                     country: 'india',
                 })
                 .end((error, response) => {
@@ -48,9 +48,9 @@ describe('Auth Api', () => {
                 chai.request(app)
                     .post('/user/signup')
                     .send({
-                        name: 'Armaan122345',
-                        email: 'armaan12232325432@gmail.com',
-                        password: 'armaan@786',
+                        name: 'Afsar Shaikh',
+                        email: 'afsarshaikh87@gmail.com',
+                        password: 'Umair@786786',
                         country: 'india',
                     })
                     .end((error, response) => {
@@ -68,8 +68,8 @@ describe('Auth Api', () => {
             chai.request(app)
                 .post('/user/login')
                 .send({
-                    email: 'armaan12232325432@gmail.com',
-                    password: 'armaan@786',
+                    email: 'afsarshaikh87@gmail.com',
+                    password: 'Umair@786786',
                 })
                 .end((error, response) => {
                     //
@@ -85,7 +85,7 @@ describe('Auth Api', () => {
             chai.request(app)
                 .post('/user/login')
                 .send({
-                    email: 'armaan12232325431@gmail.com',
+                    email: 'afsarshaikh87@gmail.com',
                     password: 'armaan@7861',
                 })
                 .end((error, response) => {
@@ -102,7 +102,7 @@ describe('Auth Api', () => {
             chai.request(app)
                 .post('/user/mfa-verify')
                 .send({
-                    email: 'israr@gmail.com',
+                    email: 'afsarshaikh87@gmail.com',
                     mfaToken: '123456',
                 })
                 .end((error, response) => {

@@ -2,7 +2,8 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 const Cryptr = require('cryptr');
 
-const sendEmail = async (subject, html, email, res) => {
+const sendEmail = async (params, res) => {
+    let {subject, text, email} = params
     const cryptr = new Cryptr(process.env.EMAIL_AUTH_SECRET_KEY);
     let pass = cryptr.decrypt(process.env.EMAIL_ENCRYPTED);
 
@@ -18,7 +19,7 @@ const sendEmail = async (subject, html, email, res) => {
         from: process.env.EMAIL,
         to: email,
         subject,
-        html,
+        html:text
         
     };
 
