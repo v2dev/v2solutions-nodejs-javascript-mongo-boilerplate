@@ -2,8 +2,6 @@ require('dotenv').config();
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const UserOauth = require('../../model/UserOauth');
 
-
-
 module.exports = (passport) => {
     passport.use(
         new GoogleStrategy(
@@ -13,16 +11,17 @@ module.exports = (passport) => {
                 callbackURL: 'http://localhost:8080/google/callback',
             },
             async function (accessToken, refreshToken, profile, done) {
-                let user
+                let user;
                 try {
-                    console.log(accessToken)
-                     user = await UserOauth.findOne({
-                        googleid: profile.id,
+                    // console.log(profile)
+                    user = await UserOauth.findOne({
+                        googleId: profile.id,
                     });
                     if (user) {
+                        console.log('helo' + user);
                         done(null, user);
                     } else {
-                        console.log('isside new user' + profile.id)
+                        console.log('isside new user' + profile.id);
                         const newUser = {
                             googleId: profile.id,
                             name: profile.displayName,
@@ -39,12 +38,14 @@ module.exports = (passport) => {
     );
 
     passport.serializeUser(function (user, done) {
-        done(null, user.id);
+        console.log('serializeUser' + user);
+        done(null, user._id);
     });
 
-    passport.deserializeUser(function (id, done) {
-        UserOauth.findById(id, function (err, user) {
-            done(err, user);
+    passport.deserializeUser(async function (id, done) {
+        console.log('deserializeUser' + id);
+        await UserOauth.findById(id).then((res) => {
+            done(null, res);
         });
     });
 };

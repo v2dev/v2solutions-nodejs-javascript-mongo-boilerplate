@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const passport = require('passport')
+const passport = require('passport');
 
 const {
     loginUser,
@@ -8,10 +8,12 @@ const {
     mfaVerifyUser,
     forgetUser,
     resetUser,
-    validateEmail
+    validateEmail,
 } = require('../controllers/AuthController');
 
 const router = express.Router();
+
+const auth = require('../services/authentication');
 
 /**
  * @swagger
@@ -248,21 +250,38 @@ router.post('/forgot-password', forgetUser);
 
 router.post('/reset-password', resetUser);
 
+/**
+ * @swagger
+ * /google:
+ *   get:
+ *     summary: To login from google Oauth 2.0
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: To verify login from google auth.
+ *       500:
+ *         description: Some server error
+ */
 
-router.get('/google',
-  passport.authenticate('google', { scope: ['profile'] }));
+router.get('/google', passport.authenticate('google', { scope: ['profile'] }));
 
-router.get('/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/login' }),
-  function(req, res) {
-    console.log(req.user)
+router.get(
+    '/google/callback',
+    passport.authenticate('google', {
+        failureRedirect: '/login',
+        successRedirect: '/success',
+    })
+    //function(req, res) {
+    // console.log(req.user)
     // Successful authentication, redirect home.
-    res.send(req.user);
-    res.redirect('/dashboard')
-  });
+    // res.send(req.user);
+    //res.redirect('/success')
+    //}
+);
 
-// router.get('/success' , (req,res) => {
-//   res.send(req.user)
-// })
+router.get('/success', (req, res) => {
+    console.log('inside' + req.user);
+    res.status(200).json({ data: req.user });
+});
 
 module.exports = router;
