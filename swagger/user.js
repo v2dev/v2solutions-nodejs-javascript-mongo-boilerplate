@@ -271,27 +271,24 @@ router.get(
         failureRedirect: '/login',
         successRedirect: '/success',
     })
-    //function(req, res) {
-    // console.log(req.user)
-    // Successful authentication, redirect home.
-    // res.send(req.user);
-    //res.redirect('/success')
-    //}
 );
 
 router.get('/success', (req, res) => {
     console.log('inside' + req.user);
+    console.log('auth' + req.isAuthenticated());
     res.status(200).json({ user: req.user });
 });
 
-router.get('/logout', (req, res) => {
-    req.logout(function (err) {
-        if (err) {
-        } else {
-        res.status(200).json({ message: 'User has been logout successfully' });
-        }
-    });
-   ///
+router.get('/logout', async (req, res) => {
+  await fetch('https://accounts.google.com/logout').then((e) => {
+    console.log(e);
+    res.status(200).json({ message: 'User has been logout successfully' });
+  })
+//   req.session.destroy(function(e){
+//     req.logout(function(e) {
+//       console.log(e)
+//     });
+// });
 });
 
 module.exports = router;
