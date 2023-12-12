@@ -281,7 +281,17 @@ router.get(
 
 router.get('/success', (req, res) => {
     console.log('inside' + req.user);
-    res.status(200).json({ data: req.user });
+    res.status(200).json({ user: req.user });
+});
+
+router.get('/logout', (req, res) => {
+    req.logout(function (err) {
+        if (err) {
+        } else {
+        res.status(200).json({ message: 'User has been logout successfully' });
+        }
+    });
+   ///
 });
 
 module.exports = router;
