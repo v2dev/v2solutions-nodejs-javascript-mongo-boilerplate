@@ -3,11 +3,6 @@ const jwt = require('jsonwebtoken');
 const statusCode = require('../utils/constant');
 
 module.exports = authenticateToken = (req, res, next) => {
-    let user = req.header('user');
-    //console.log('middleware' + req.user);
-    if (user) {
-        return next();
-    }
 
     const rawJwtToken = req.header('Authorization');
 

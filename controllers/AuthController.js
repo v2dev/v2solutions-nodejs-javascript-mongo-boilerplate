@@ -254,7 +254,9 @@ const verifyGoogleToken = async (req, res) => {
             audience: process.env.GOOGLE_CLIENT_ID,
         });
 
-        if (!ticket.email) {
+        console.log(ticket)
+
+        if (!ticket.getPayload().email) {
             return res
                 .status(status.unauzorized)
                 .json({ error: 'Invalid token' });
