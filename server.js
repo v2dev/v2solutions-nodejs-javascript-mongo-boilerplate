@@ -13,11 +13,6 @@ const EmployeeRoute = require('./swagger/employee');
 
 // eslint-disable-next-line no-unused-vars
 const connection = require('./utils/db/connection');
-const passport = require('passport');
-require('./utils/passport/passport');
-const session = require('express-session')
-
-require('./utils/passport/passport')(passport)
 
 const options = {
     definition: {
@@ -60,15 +55,6 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-app.use(session({
-    secret: 'v2solutions',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }
-  }))
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use(UserRoute);
 app.use(EmployeeRoute);

@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const passport = require('passport');
 
 const {
     loginUser,
@@ -9,11 +8,10 @@ const {
     forgetUser,
     resetUser,
     validateEmail,
+    verifyGoogleToken
 } = require('../controllers/AuthController');
 
 const router = express.Router();
-
-const auth = require('../services/authentication');
 
 /**
  * @swagger
@@ -116,6 +114,17 @@ const auth = require('../services/authentication');
  *         otp: "123456"
  *         password: "1234567890"
  *         confirmPassword: "1234567890"
+ * 
+ *     Google:
+ *       type: object
+ *       required:
+ *         - token
+ *       properties:
+ *         token:
+ *           type: integer
+ *           description: token send to registered email id.
+ *       example:
+ *         token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI"
  */
 
 /**
@@ -252,43 +261,27 @@ router.post('/reset-password', resetUser);
 
 /**
  * @swagger
- * /google:
- *   get:
- *     summary: To login from google Oauth 2.0
+ * /verify-google-token:
+ *   post:
+ *     summary: login from google auth
  *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Google'
  *     responses:
  *       200:
- *         description: To verify login from google auth.
+ *         description: To verfiy from google auth
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Google'
  *       500:
  *         description: Some server error
  */
 
-router.get('/google', passport.authenticate('google', { scope: ['profile'] }));
-
-router.get(
-    '/google/callback',
-    passport.authenticate('google', {
-        failureRedirect: '/login',
-        successRedirect: '/success',
-    })
-);
-
-router.get('/success', (req, res) => {
-    console.log('inside' + req.user);
-    console.log('auth' + req.isAuthenticated());
-    res.status(200).json({ user: req.user });
-});
-
-router.get('/logout', async (req, res) => {
-  await fetch('https://accounts.google.com/logout').then((e) => {
-    console.log(e);
-    res.status(200).json({ message: 'User has been logout successfully' });
-  })
-//   req.session.destroy(function(e){
-//     req.logout(function(e) {
-//       console.log(e)
-//     });
-// });
-});
+router.post('/verify-google-token', verifyGoogleToken);
 
 module.exports = router;

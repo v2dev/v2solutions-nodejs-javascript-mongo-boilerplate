@@ -7,14 +7,17 @@ const speakeasy = require('speakeasy');
 const User = require('../model/User');
 const uuid = require('uuid');
 const { sendEmail } = require('../utils/email/sendEmail');
-const status = require('../utils/constant')
+const status = require('../utils/constant');
+const { OAuth2Client } = require('google-auth-library');
 
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(status.unauzorized).json({ error: 'Invalid credentials' });
+            return res
+                .status(status.unauzorized)
+                .json({ error: 'Invalid credentials' });
         }
         // if(!user.verified) {
         //     return res.status(status.unauzorized).json({ error: 'Please verify your email to login' });
@@ -26,7 +29,9 @@ const loginUser = async (req, res) => {
                 qrCodeUrl: user.qrCodeUrl,
             });
         } else {
-            res.status(status.unauzorized).json({ error: 'Invalid credentials' });
+            res.status(status.unauzorized).json({
+                error: 'Invalid credentials',
+            });
         }
     } catch (error) {
         console.error('Error during login:', error);
@@ -74,7 +79,9 @@ const validateEmail = async (req, res) => {
 
         const user = await User.findById(id);
         if (!user) {
-            return res.status(status.unprocess).json({ error: 'Verification is expired' });
+            return res
+                .status(status.unprocess)
+                .json({ error: 'Verification is expired' });
         }
         const mfaSecret = speakeasy.generateSecret({
             length: 20,
@@ -87,7 +94,9 @@ const validateEmail = async (req, res) => {
         const qrCode = await QRCode.toDataURL(mfaSecret.otpauth_url);
         res.status(status.success).json({ newUser, qrCodeUrl: qrCode });
     } catch (error) {
-        res.status(status.internal_server).json({ error: 'Failed to create a new user' });
+        res.status(status.internal_server).json({
+            error: 'Failed to create a new user',
+        });
     }
 };
 
@@ -96,7 +105,9 @@ const mfaVerifyUser = async (req, res) => {
         const { email, mfaToken } = req.body;
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(status.unauzorized).json({ error: 'Invalid credentials' });
+            return res
+                .status(status.unauzorized)
+                .json({ error: 'Invalid credentials' });
         }
         const token = speakeasy.totp({
             secret: user.mfaSecret,
@@ -128,7 +139,9 @@ const mfaVerifyUser = async (req, res) => {
         }
     } catch (errorundefined) {
         console.error('Error during verification:', errorundefined);
-        res.status(status.internal_server).json({ error: 'Verification failed' });
+        res.status(status.internal_server).json({
+            error: 'Verification failed',
+        });
     }
 };
 const forgetUser = async (req, res) => {
@@ -137,7 +150,9 @@ const forgetUser = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(status.unprocess).json({ error: 'User not found' });
+            return res
+                .status(status.unprocess)
+                .json({ error: 'User not found' });
         }
         const resetToken = Math.floor(
             100000 + Math.random() * 900000
@@ -152,12 +167,14 @@ const forgetUser = async (req, res) => {
         let params = {
             subject: 'Reset Password',
             text,
-            email
-        }
+            email,
+        };
         await sendEmail(params, res);
     } catch (error) {
         console.error('Error during forgot password:', error);
-        res.status(status.internal_server).json({ error: 'Forgot password failed' });
+        res.status(status.internal_server).json({
+            error: 'Forgot password failed',
+        });
     }
 };
 
@@ -168,7 +185,9 @@ const resetUser = async (req, res) => {
         console.log(token);
 
         if (password !== confirmPassword) {
-            return res.status(status.unprocess).json({ error: 'Passwords do not match' });
+            return res
+                .status(status.unprocess)
+                .json({ error: 'Passwords do not match' });
         }
         if (token) {
             if (!password || !confirmPassword) {
@@ -178,7 +197,9 @@ const resetUser = async (req, res) => {
             }
             user = await User.findOne({ token });
             if (!user) {
-                return res.status(status.unprocess).json({ error: 'Invalid token' });
+                return res
+                    .status(status.unprocess)
+                    .json({ error: 'Invalid token' });
             }
             user = await User.findOne({ token });
             if (!user) {
@@ -204,10 +225,69 @@ const resetUser = async (req, res) => {
         user.resetPasswordExpires = undefined;
         user.token = undefined;
         await user.save();
-        res.status(status.success).json({ message: 'Password reset successfully' });
+        res.status(status.success).json({
+            message: 'Password reset successfully',
+        });
     } catch (error) {
         console.error('Error resetting password:', error);
-        res.status(status.internal_server).json({ error: 'Failed to reset password' });
+        res.status(status.internal_server).json({
+            error: 'Failed to reset password',
+        });
+    }
+};
+
+const verifyGoogleToken = async (req, res) => {
+    const { token } = req.body;
+    console.log(token);
+    try {
+        const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+        if (!token) {
+            res.status(status.bad_request).json({
+                error: 'Please provide token',
+            });
+        }
+
+        // Verify the Google access token
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        if (!ticket.email) {
+            return res
+                .status(status.unauzorized)
+                .json({ error: 'Invalid token' });
+        }
+
+        const payload = ticket.getPayload();
+        const userId = payload.sub;
+        const userEmail = payload.email;
+
+        //   Check if the user exists in your database, create if not (pseudo-code)
+        const user = await User.findOne({ email: userEmail });
+        if (!user) {
+            const newUser = new User({ email: userEmail });
+            await newUser.save();
+        }
+        const jwtFToken = jwt.sign(
+            { email: userEmail },
+            process.env.JWT_TOKEN,
+            {
+                expiresIn: '2h',
+            }
+        );
+        res.status(status.success).json({
+            message: 'Verification successful',
+            jwtToken: jwtFToken,
+            success: true,
+        });
+    } catch (error) {
+        console.error('Error verifying Google token:', error);
+        res.status(status.unauzorized).json({
+            success: false,
+            error: 'Invalid token',
+        });
     }
 };
 
@@ -218,4 +298,5 @@ module.exports = {
     forgetUser,
     resetUser,
     validateEmail,
+    verifyGoogleToken,
 };
