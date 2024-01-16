@@ -1,0 +1,6 @@
+@echo off
+
+set DOCKER_USERNAME=%1
+set DOCKER_PASSWORD=%2
+
+docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
