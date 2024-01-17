@@ -23,21 +23,14 @@ pipeline{
                 }
             }
         }
-        stage("login"){
-            steps{
-                bat '@echo off'
-                bat 'echo %WORKSPACE%'
-                dir("DevOpsScripts") {
-                    bat './login_script.bat %DOCKER_USERNAME% %DOCKER_PASSWORD%'
-                }
-            }
-        }
         stage("push"){
             steps{
-                bat '@echo off'
-                bat 'echo %WORKSPACE%'
-                dir("DevOpsScripts") {
-                    bat './push_script.bat'
+                withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
+                    bat '@echo off'
+                    bat 'echo %WORKSPACE%'
+                    dir("DevOpsScripts") {
+                        bat './push_script.bat %BUILD_NUMBER%'
+                    }
                 }
             }
         }
