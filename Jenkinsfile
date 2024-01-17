@@ -15,6 +15,7 @@ pipeline{
             }
         }
         stage("build"){
+            // Triggered when the PR is raised and there is push to main branch
             when {
                 expression {
                     currentBuild.changeSets.any {
