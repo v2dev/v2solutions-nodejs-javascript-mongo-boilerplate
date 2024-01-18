@@ -38,7 +38,7 @@ pipeline{
                     def scannerHome = tool 'SonarQubeScanner'
                     withSonarQubeEnv("${SONARQUBE_SERVER}") {
                         sh "${scannerHome}/bin/sonar-scanner -Dsonar.login=${SONARQUBE_CREDENTIALS}"
-                        bat 'sonar-scanner.bat -D"sonar.projectKey=Nodejs" -D"sonar.sources=." -D"sonar.host.url=http://192.168.8.71:9000" -D"sonar.token=sqp_6ac7d7c4a9b56c5730f784c5e61d54d085679401"'
+                        bat "${scannerHome}/bin/sonar-scanner.bat -D\"sonar.projectKey=Nodejs\" -D\"sonar.sources=.\" -D\"sonar.host.url=http://192.168.8.71:9000\" -D\"sonar.token=sqp_6ac7d7c4a9b56c5730f784c5e61d54d085679401\""
                     }
                 }
             }
