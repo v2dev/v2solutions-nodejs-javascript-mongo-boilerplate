@@ -14,6 +14,19 @@ pipeline{
                 git branch: 'Chandrashekar_main', url: 'https://github.com/v2dev/v2solutions-nodejs-boilerplate.git'
             }
         }
+
+        stage("build-nodejs"){
+            steps{
+                script{
+                    sh 'npm install'
+                    sh 'npm run build'
+                }
+            }
+        }
+
+
+
+
         stage("build"){
             // when {
             //     expression {
