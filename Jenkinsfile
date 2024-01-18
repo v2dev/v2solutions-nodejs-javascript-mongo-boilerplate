@@ -3,6 +3,14 @@ pipeline{
     options {
         skipDefaultCheckout(true)
     }
+
+    environment {
+        SONARQUBE_CREDENTIALS = credentials('sonar-cred')
+        SONARQUBE_SERVER = 'sonarconfig'
+        NODEJS_VERSION = '14' // Adjust the Node.js version as needed
+    }
+
+
     stages{
         stage("Initialise"){
             steps{
@@ -15,11 +23,22 @@ pipeline{
             }
         }
 
-        stage("build-nodejs"){
-            steps{
-                script{
-                    sh 'npm install'
-                    sh 'npm run build'
+        // stage("build-nodejs"){
+        //     steps{
+        //         script{
+        //             sh 'npm install'
+        //             sh 'npm run build'
+        //         }
+        //     }
+        // }
+
+        stage('SonarQube Scan') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarQubeScanner'
+                    withSonarQubeEnv(${SONARQUBE_SERVER}) {
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.login=${SONARQUBE_CREDENTIALS}"
+                    }
                 }
             }
         }
