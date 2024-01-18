@@ -15,14 +15,14 @@ pipeline{
             }
         }
         stage("build"){
-            when {
-                expression {
-                    currentBuild.changeSets.any {
-                        it.branch == 'Chandrashekar_main' ||
-                        it.changeRequest && it.changeRequest.target.branch == 'Chandrashekar_main'
-                    }
-                }
-            }
+            // when {
+            //     expression {
+            //         currentBuild.changeSets.any {
+            //             it.branch == 'Chandrashekar_main' ||
+            //             it.changeRequest && it.changeRequest.target.branch == 'Chandrashekar_main'
+            //         }
+            //     }
+            // }
             steps{
                 bat '@echo off'
                 bat 'echo %WORKSPACE%'
@@ -32,9 +32,9 @@ pipeline{
             }
         }
         stage("push"){
-            when {
-                expression { currentBuild.changeSets.any { it.branch == 'Chandrashekar_main' } }
-            }
+            // when {
+            //     expression { currentBuild.changeSets.any { it.branch == 'Chandrashekar_main' } }
+            // }
             steps{
                 withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
                     bat '@echo off'
