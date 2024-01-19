@@ -4,11 +4,11 @@ pipeline{
         skipDefaultCheckout(true)
     }
 
-    environment {
-        SONARQUBE_CREDENTIALS = credentials('sonar-cred')
-        SONARQUBE_SERVER = 'sonarconfig'
-        LOCAL_SCAN_TOKEN = credentials('LocalScanToken')
-    }
+    // environment {
+    //     SONARQUBE_CREDENTIALS = credentials('sonar-cred')
+    //     SONARQUBE_SERVER = 'sonarconfig'
+    //     LOCAL_SCAN_TOKEN = credentials('LocalScanToken')
+    // }
 
     stages{
         stage("Initialise"){
