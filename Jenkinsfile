@@ -37,6 +37,23 @@ pipeline{
             }   
         }
 
+        // Quality Gate Stage
+        stage('Quality Gate') {
+            steps {
+                script {
+                    withSonarQubeEnv(SONARQUBE_SERVER) {
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK') {
+                            error "Quality Gate failed: ${qg.status}"
+                        }
+                        else {
+                            echo "Quality Gate Success"
+                        }
+                    }
+                }
+            }
+        }
+
         // Build Stage
         stage("build"){
             steps{
