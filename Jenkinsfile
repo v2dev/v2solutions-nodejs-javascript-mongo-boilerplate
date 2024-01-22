@@ -9,7 +9,6 @@ pipeline{
         SONARQUBE_CREDENTIALS = credentials('sonar-cred')
         SONARQUBE_SERVER = 'sonarconfig'
         SCAN_TOKEN = credentials('nodejs-scan-token')
-        EMAIL_TO = 'sagar.thorat@v2solutions.com'
     }
 
     stages{
@@ -52,29 +51,6 @@ pipeline{
                         }
                     }
                 }
-            }
-        }
-
-        // Generate Scan Report
-        stage('Generate Scan Report') {
-            steps {
-                script {
-                    def scannerHome = tool 'SonarQubeScanner'
-                    def projectKey = "Nodejs"
-                    withSonarQubeEnv(SONARQUBE_SERVER) {
-                        bat "${scannerHome}/bin/sonar-scanner.bat -D\"sonar.projectKey=${projectKey}\" -D\"sonar.sources=.\" -D\"sonar.host.url=http://192.168.8.71:9000\" -D\"sonar.login=${SONARQUBE_CREDENTIALS}\" -D\"sonar.analysis.mode=preview\" -D\"sonar.issuesReport.html.enable=true\""
-                    }
-                }
-            }
-        }
-
-        // Email Stage
-        stage("Email Report") {
-            steps {
-                emailext subject: 'SonarQube Scan Report',
-                          body: 'Please find the attached SonarQube Scan Report.',
-                          to: EMAIL_TO,
-                          attachmentsPattern: '**/target/sonar/report-task.txt'
             }
         }
 
