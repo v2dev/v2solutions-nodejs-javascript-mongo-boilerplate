@@ -7,7 +7,7 @@ pipeline{
     environment {
         SONARQUBE_CREDENTIALS = credentials('sonar-cred')
         SONARQUBE_SERVER = 'sonarconfig'
-        LOCAL_SCAN_TOKEN = credentials('LocalScanToken')
+        LOCAL_SCAN_TOKEN = credentials('nodejs-scan-token')
     }
 
     stages{
@@ -26,9 +26,12 @@ pipeline{
             steps {
                 script {
                     def scannerHome = tool 'SonarQubeScanner'
-                    withSonarQubeEnv("${SONARQUBE_SERVER}") {
+                    withSonarQubeEnv(SONARQUBE_SERVER) {
+                        echo "Current working directory: ${pwd()}"
+                        echo "Contents of workspace:"
+                        bat 'dir /s'
                         sh "${scannerHome}/bin/sonar-scanner -Dsonar.login=${SONARQUBE_CREDENTIALS}"
-                        bat "${scannerHome}/bin/sonar-scanner.bat -D\"sonar.projectKey=Nodejs\" -D\"sonar.sources=.\" -D\"sonar.host.url=${SONARQUBE_SERVER}\" -D\"sonar.token=${LOCAL_SCAN_TOKEN}\""
+                        bat "${scannerHome}/bin/sonar-scanner.bat -D\"sonar.projectKey=Nodejs\" -D\"sonar.sources=.\" -D\"sonar.host.url=${SONARQUBE_SERVER}\" -D\"sonar.token=${nodejs-scan-token}\""
                     }
                 }
             }
