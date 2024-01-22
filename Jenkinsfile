@@ -22,21 +22,34 @@ pipeline{
             }
         }
 
+        // stage('SonarQube Scan') {
+        //     steps {
+        //         script {
+        //             def scannerHome = tool 'SonarQubeScanner'
+        //             withSonarQubeEnv(SONARQUBE_SERVER) {
+        //                 echo "Current working directory: ${pwd()}"
+        //                 // echo "Contents of workspace:"
+        //                 // bat 'dir /s'
+        //                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.login=${SONARQUBE_CREDENTIALS}"
+        //                 // bat "${scannerHome}/bin/sonar-scanner.bat -D\"sonar.projectKey=Nodejs\" -D\"sonar.sources=.\" -D\"sonar.host.url=http://192.168.8.71:9000\" -D\"sonar.token=sqp_aaa2630a9f131c4b3be05e0ae3a7ec07294585a2\""
+        //                 bat "${scannerHome}/bin/sonar-scanner.bat -D\"sonar.projectKey=Nodejs\" -D\"sonar.sources=.\" -D\"sonar.host.url=${SONARQUBE_SERVER}\" -D\"sonar.token=sqp_aaa2630a9f131c4b3be05e0ae3a7ec07294585a2\""
+        //                 // bat "${scannerHome}/bin/sonar-scanner.bat -D\"sonar.projectKey=Nodejs\" -D\"sonar.sources=.\" -D\"sonar.host.url=${SONARQUBE_SERVER}\" -D\"sonar.token=${SCAN_TOKEN}\""
+        //             }
+        //         }
+        //     }
+        // }
+
         stage('SonarQube Scan') {
             steps {
                 script {
                     def scannerHome = tool 'SonarQubeScanner'
+                    def projectKey = "Nodejs"
                     withSonarQubeEnv(SONARQUBE_SERVER) {
                         echo "Current working directory: ${pwd()}"
-                        // echo "Contents of workspace:"
-                        // bat 'dir /s'
-                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.login=${SONARQUBE_CREDENTIALS}"
-                        bat "${scannerHome}/bin/sonar-scanner.bat -D\"sonar.projectKey=Nodejs\" -D\"sonar.sources=.\" -D\"sonar.host.url=http://192.168.8.71:9000\" -D\"sonar.token=sqp_aaa2630a9f131c4b3be05e0ae3a7ec07294585a2\""
-                        bat "${scannerHome}/bin/sonar-scanner.bat -D\"sonar.projectKey=Nodejs\" -D\"sonar.sources=.\" -D\"sonar.host.url=${SONARQUBE_SERVER}\" -D\"sonar.token=sqp_aaa2630a9f131c4b3be05e0ae3a7ec07294585a2\""
-                        // bat "${scannerHome}/bin/sonar-scanner.bat -D\"sonar.projectKey=Nodejs\" -D\"sonar.sources=.\" -D\"sonar.host.url=${SONARQUBE_SERVER}\" -D\"sonar.token=${SCAN_TOKEN}\""
+                        bat "./sonarqube_script.bat ${scannerHome} ${projectKey}"
                     }
                 }
-            }
+            }   
         }
 
         stage("build"){
