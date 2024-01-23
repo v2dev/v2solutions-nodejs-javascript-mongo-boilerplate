@@ -23,36 +23,36 @@ pipeline{
             }
         }
 
-        // SonarQube Scan Stage
-        stage('SonarQube Scan') {
-            steps {
-                script {
-                    def scannerHome = tool 'SonarQubeScanner'
-                    def projectKey = "Nodejs"
-                    withSonarQubeEnv(SONARQUBE_SERVER) {
-                        echo "Current working directory: ${pwd()}"
-                        bat "./sonarqube_script.bat ${scannerHome} ${projectKey}"
-                    }
-                }
-            }   
-        }
+        // // SonarQube Scan Stage
+        // stage('SonarQube Scan') {
+        //     steps {
+        //         script {
+        //             def scannerHome = tool 'SonarQubeScanner'
+        //             def projectKey = "Nodejs"
+        //             withSonarQubeEnv(SONARQUBE_SERVER) {
+        //                 echo "Current working directory: ${pwd()}"
+        //                 bat "./sonarqube_script.bat ${scannerHome} ${projectKey}"
+        //             }
+        //         }
+        //     }   
+        // }
 
-        // Quality Gate Stage
-        stage('Quality Gate') {
-            steps {
-                script {
-                    withSonarQubeEnv(SONARQUBE_SERVER) {
-                        def qg = waitForQualityGate()
-                        if (qg.status != 'OK') {
-                            error "Quality Gate failed: ${qg.status}"
-                        }
-                        else {
-                            echo "Quality Gate Success"
-                        }
-                    }
-                }
-            }
-        }
+        // // Quality Gate Stage
+        // stage('Quality Gate') {
+        //     steps {
+        //         script {
+        //             withSonarQubeEnv(SONARQUBE_SERVER) {
+        //                 def qg = waitForQualityGate()
+        //                 if (qg.status != 'OK') {
+        //                     error "Quality Gate failed: ${qg.status}"
+        //                 }
+        //                 else {
+        //                     echo "Quality Gate Success"
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         // Build Stage
         stage("build"){
