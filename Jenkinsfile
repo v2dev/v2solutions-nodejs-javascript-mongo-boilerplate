@@ -88,7 +88,7 @@ pipeline{
                     dir("node-js-app-chart") {
                         withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
                             // Push the Helm chart to Docker Hub
-                            sh "helm push nodejs-helm-chart.tgz  oci://registry-1.docker.io/v2solutions-nodejs-helmchart"
+                            sh "helm push nodejs-helm-chart.tgz  oci://registry-1.docker.io/v2devops"
                             echo "helm chart push successful"
                         }
                     }
