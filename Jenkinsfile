@@ -71,8 +71,13 @@ pipeline{
                 script {
                     dir("node-js-app-chart") {
                         // Run commands to create the Helm chart (e.g., helm package)
+                        bat '@echo off'
                         bat 'echo "Creating package"'
                         bat 'helm package .'
+                        bat 'set "tgzFile="'
+                        bat 'for %%i in (*.tgz) do set "tgzFile=%%i"'
+                        bat 'echo tgz file name is ----> %tgzFile%'
+                        bat 'ren "%tgzFile%" "nodejs-helm-chart.tgz"'
                         // Get the generated chart file name
                         // def chartFileName = bat(script: 'ls -1 | grep \'.tgz\'', returnStdout: true).trim()
                         // Rename the chart file to a unique name
