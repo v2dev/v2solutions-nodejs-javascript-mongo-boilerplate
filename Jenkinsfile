@@ -23,36 +23,36 @@ pipeline{
             }
         }
 
-        // // SonarQube Scan Stage
-        // stage('SonarQube Scan') {
-        //     steps {
-        //         script {
-        //             def scannerHome = tool 'SonarQubeScanner'
-        //             def projectKey = "Nodejs"
-        //             withSonarQubeEnv(SONARQUBE_SERVER) {
-        //                 echo "Current working directory: ${pwd()}"
-        //                 bat "./sonarqube_script.bat ${scannerHome} ${projectKey}"
-        //             }
-        //         }
-        //     }   
-        // }
+        // SonarQube Scan Stage
+        stage('SonarQube Scan') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarQubeScanner'
+                    def projectKey = "Nodejs"
+                    withSonarQubeEnv(SONARQUBE_SERVER) {
+                        echo "Current working directory: ${pwd()}"
+                        bat "./sonarqube_script.bat ${scannerHome} ${projectKey}"
+                    }
+                }
+            }   
+        }
 
-        // // Quality Gate Stage
-        // stage('Quality Gate') {
-        //     steps {
-        //         script {
-        //             withSonarQubeEnv(SONARQUBE_SERVER) {
-        //                 def qg = waitForQualityGate()
-        //                 if (qg.status != 'OK') {
-        //                     error "Quality Gate failed: ${qg.status}"
-        //                 }
-        //                 else {
-        //                     echo "Quality Gate Success"
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        // Quality Gate Stage
+        stage('Quality Gate') {
+            steps {
+                script {
+                    withSonarQubeEnv(SONARQUBE_SERVER) {
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK') {
+                            error "Quality Gate failed: ${qg.status}"
+                        }
+                        else {
+                            echo "Quality Gate Success"
+                        }
+                    }
+                }
+            }
+        }
 
         // Build Stage
         stage("build"){
@@ -76,14 +76,6 @@ pipeline{
                         bat '@echo off'
                         bat 'echo "Creating package"'
                         bat 'helm package .'
-                        // bat 'set "tgzFile="'
-                        // bat 'for %%i in (*.tgz) do set "tgzFile=%%i"'
-                        // bat 'echo tgz file name is ----> %tgzFile%'
-                        // bat 'ren "%tgzFile%" "nodejs-helm-chart.tgz"'
-                        // Get the generated chart file name
-                        // def chartFileName = bat(script: 'ls -1 | grep \'.tgz\'', returnStdout: true).trim()
-                        // Rename the chart file to a unique name
-                        // bat "mv $chartFileName nodejs-helm-chart.tgz"
                     }
                 }
             }
