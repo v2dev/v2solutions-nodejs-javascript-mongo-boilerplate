@@ -74,9 +74,9 @@ pipeline{
                         bat 'echo "Creating package"'
                         bat 'helm package .'
                         // Get the generated chart file name
-                        def chartFileName = bat(script: 'ls -1 | grep \'.tgz\'', returnStdout: true).trim()
+                        // def chartFileName = bat(script: 'ls -1 | grep \'.tgz\'', returnStdout: true).trim()
                         // Rename the chart file to a unique name
-                        bat "mv $chartFileName nodejs-helm-chart.tgz"
+                        // bat "mv $chartFileName nodejs-helm-chart.tgz"
                     }
                 }
             }
