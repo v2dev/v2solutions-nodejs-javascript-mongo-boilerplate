@@ -69,6 +69,8 @@ pipeline{
         stage("Helm Chart") {
             steps {
                 script {
+                    // Update Helm chart values.yaml with the build number
+                    updateHelmChartValues(env.BUILD_NUMBER)
                     dir("node-js-app-chart") {
                         // Run commands to create the Helm chart (e.g., helm package)
                         bat '@echo off'
@@ -115,4 +117,16 @@ pipeline{
             }
         }
     }
+}
+
+def updateHelmChartValues(buildNumber) {
+    // Read values.yaml file
+    def valuesYamlPath = "node-js-app-chart/values.yaml"
+    def valuesYamlContent = readFile(file: valuesYamlPath).trim()
+
+    // Update image tag with the build number
+    valuesYamlContent = valuesYamlContent.replaceAll(/tag: latest/, "tag: ${buildNumber}")
+
+    // Write updated values.yaml file
+    writeFile(file: valuesYamlPath, text: valuesYamlContent)
 }
