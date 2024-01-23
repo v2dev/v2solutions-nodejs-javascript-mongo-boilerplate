@@ -71,6 +71,7 @@ pipeline{
                 script {
                     dir("node-js-app-chart") {
                         // Run commands to create the Helm chart (e.g., helm package)
+                        sh 'echo "Creating package"'
                         sh 'helm package .'
                         // Get the generated chart file name
                         def chartFileName = sh(script: 'ls -1 | grep \'.tgz\'', returnStdout: true).trim()
