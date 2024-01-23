@@ -85,10 +85,12 @@ pipeline{
         stage("Push Helm Chart to Docker Hub") {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-                        // Push the Helm chart to Docker Hub
-                        sh "helm push nodejs-helm-chart.tgz  oci://registry-1.docker.io/v2solutions-nodejs-helmchart"
-                        echo "helm chart push successful"
+                    dir("node-js-app-chart") {
+                        withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
+                            // Push the Helm chart to Docker Hub
+                            sh "helm push nodejs-helm-chart.tgz  oci://registry-1.docker.io/v2solutions-nodejs-helmchart"
+                            echo "helm chart push successful"
+                        }
                     }
                 }
             }
