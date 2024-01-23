@@ -74,10 +74,10 @@ pipeline{
                         bat '@echo off'
                         bat 'echo "Creating package"'
                         bat 'helm package .'
-                        bat 'set "tgzFile="'
-                        bat 'for %%i in (*.tgz) do set "tgzFile=%%i"'
-                        bat 'echo tgz file name is ----> %tgzFile%'
-                        bat 'ren "%tgzFile%" "nodejs-helm-chart.tgz"'
+                        // bat 'set "tgzFile="'
+                        // bat 'for %%i in (*.tgz) do set "tgzFile=%%i"'
+                        // bat 'echo tgz file name is ----> %tgzFile%'
+                        // bat 'ren "%tgzFile%" "nodejs-helm-chart.tgz"'
                         // Get the generated chart file name
                         // def chartFileName = bat(script: 'ls -1 | grep \'.tgz\'', returnStdout: true).trim()
                         // Rename the chart file to a unique name
@@ -94,7 +94,7 @@ pipeline{
                     dir("node-js-app-chart") {
                         withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
                             // Push the Helm chart to Docker Hub
-                            bat "helm push nodejs-helm-chart.tgz  oci://registry-1.docker.io/v2devops"
+                            bat "helm push nodejs-app-0.1.0.tgz  oci://registry-1.docker.io/v2devops"
                             // echo "helm chart push successful"
                         }
                     }
