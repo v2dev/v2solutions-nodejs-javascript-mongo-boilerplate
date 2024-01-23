@@ -71,12 +71,12 @@ pipeline{
                 script {
                     dir("node-js-app-chart") {
                         // Run commands to create the Helm chart (e.g., helm package)
-                        sh 'echo "Creating package"'
-                        sh 'helm package .'
+                        bat 'echo "Creating package"'
+                        bat 'helm package .'
                         // Get the generated chart file name
                         def chartFileName = sh(script: 'ls -1 | grep \'.tgz\'', returnStdout: true).trim()
                         // Rename the chart file to a unique name
-                        sh "mv $chartFileName nodejs-helm-chart.tgz"
+                        bat "mv $chartFileName nodejs-helm-chart.tgz"
                     }
                 }
             }
