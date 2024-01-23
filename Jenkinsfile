@@ -64,6 +64,35 @@ pipeline{
                 }
             }
         }
+
+        // Helm Chart Stage
+        stage("Helm Chart") {
+            steps {
+                script {
+                    dir("node-js-app-chart") {
+                        // Run commands to create the Helm chart (e.g., helm package)
+                        sh 'helm package .'
+                        // Get the generated chart file name
+                        def chartFileName = sh(script: 'ls -1 | grep \'.tgz\'', returnStdout: true).trim()
+                        // Rename the chart file to a unique name
+                        sh "mv $chartFileName nodejs-helm-chart.tgz"
+                    }
+                }
+            }
+        }
+
+        // Push Helm Chart to Docker Hub
+        stage("Push Helm Chart to Docker Hub") {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
+                        // Push the Helm chart to Docker Hub
+                        sh "helm push nodejs-helm-chart.tgz  oci://registry-1.docker.io/v2solutions-nodejs-helmchart"
+                        echo "helm chart push successful"
+                    }
+                }
+            }
+        }
         
         // Push Images to docker hub
         stage("push"){
