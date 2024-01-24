@@ -36,9 +36,33 @@ pipeline{
                         // Manually construct the SonarQube Analysis URL
                         def sonarqubeUrl = "${SONARQUBE_SERVER}/dashboard?id=${projectKey}"
                         echo "SonarQube Analysis URL: ${sonarqubeUrl}"
+
+                        // Set the URL as an environment variable to use it in later stages
+                        env.SONARQUBE_URL = sonarqubeUrl
                     }
                 }
             }   
+        }
+
+        // Email Notification Stage
+        stage('Email Notification') {
+            steps {
+                script {
+                    // Check if the SONARQUBE_URL environment variable is set
+                    if (env.SONARQUBE_URL) {
+                        // Compose the email body with the manually constructed SonarQube Analysis URL
+                        def emailBody = "SonarQube Analysis URL: ${env.SONARQUBE_URL}"
+
+                        // Send email using the emailext plugin
+                        emailext body: emailBody,
+                                subject: 'SonarQube Analysis Report',
+                                to: 'sagar.thorat@v2solutions.com',
+                                mimeType: 'text/html'
+                    } else {
+                        error "SonarQube Analysis URL is not available. Make sure the previous stage executed successfully."
+                    }
+                }
+            }
         }
 
         // Quality Gate Stage
