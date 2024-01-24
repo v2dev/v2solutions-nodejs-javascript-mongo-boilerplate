@@ -31,39 +31,8 @@ pipeline{
                     def projectKey = "Nodejs"
                     withSonarQubeEnv(SONARQUBE_SERVER) {
                         echo "Current working directory: ${pwd()}"
-                        def scanOutput = bat "./sonarqube_script.bat ${scannerHome} ${projectKey}"
-
-                        // Extract SonarQube URL from the scan output
-                        def sonarqubeUrlMatch = scanOutput =~ /INFO: ANALYSIS SUCCESSFUL, you can find the results at: (.+)$/
-                        echo "Scan Output-----: ${scanOutput}"
-                        if (sonarqubeUrlMatch) {
-                            sonarqubeUrl = sonarqubeUrlMatch[0][1].trim()
-                            echo "SonarQube Analysis URL-----: ${sonarqubeUrl}"
-                            env.SONARQUBE_URL = sonarqubeUrl
-                        } else {
-                            error "Failed to extract SonarQube Analysis URL from scan output."
-                        }
-
-                        // // Extract SonarQube URL from the scan output
-                        // def sonarqubeUrl = scanOutput =~ /INFO: ANALYSIS SUCCESSFUL, you can find the results at: (.+)$/
-                        // if (sonarqubeUrl) {
-                        //     sonarqubeUrl = sonarqubeUrl[0][1]
-                        //     echo "SonarQube Analysis URL is ----------: ${sonarqubeUrl}"
-
-                        //     // Set the URL as an environment variable to use it in later stages
-                        //     env.SONARQUBE_URL = sonarqubeUrl
-                        // } else {
-                        //     error "Failed to extract SonarQube Analysis URL from scan output."
-                        // }
-
-                        // Extract SonarQube URL from the scan output
-                        // def sonarqubeUrl = scanOutput =~ /INFO: ANALYSIS SUCCESSFUL, you can find the results at: (.+)$/
-                        // if (sonarqubeUrl) {
-                        //     sonarqubeUrl = sonarqubeUrl[0][1]
-                        //     echo "SonarQube Analysis URL: ${sonarqubeUrl}"
-                        // } else {
-                        //     error "Failed to extract SonarQube Analysis URL from scan output."
-                        // }
+                        bat "./sonarqube_script.bat ${scannerHome} ${projectKey}"
+                        echo "SONARQUBE SERVER IS---- ${SONARQUBE_SERVER}"
                     }
                 }
             }   
