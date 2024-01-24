@@ -34,94 +34,94 @@ pipeline{
                         def scanOutput = bat "./sonarqube_script.bat ${scannerHome} ${projectKey}"
 
                         // Extract SonarQube URL from the scan output
-                        def sonarqubeUrl = scanOutput =~ /INFO: ANALYSIS SUCCESSFUL, you can find the results at: (.+)$/
-                        if (sonarqubeUrl) {
-                            sonarqubeUrl = sonarqubeUrl[0][1]
-                            echo "SonarQube Analysis URL: ${sonarqubeUrl}"
-                        } else {
-                            error "Failed to extract SonarQube Analysis URL from scan output."
-                        }
+                        // def sonarqubeUrl = scanOutput =~ /INFO: ANALYSIS SUCCESSFUL, you can find the results at: (.+)$/
+                        // if (sonarqubeUrl) {
+                        //     sonarqubeUrl = sonarqubeUrl[0][1]
+                        //     echo "SonarQube Analysis URL: ${sonarqubeUrl}"
+                        // } else {
+                        //     error "Failed to extract SonarQube Analysis URL from scan output."
+                        // }
                     }
                 }
             }   
         }
 
-        // // Quality Gate Stage
-        // stage('Quality Gate') {
-        //     steps {
-        //         script {
-        //             withSonarQubeEnv(SONARQUBE_SERVER) {
-        //                 def qg = waitForQualityGate()
-        //                 if (qg.status != 'OK') {
-        //                     error "Quality Gate failed: ${qg.status}"
-        //                 }
-        //                 else {
-        //                     echo "Quality Gate Success"
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        // Quality Gate Stage
+        stage('Quality Gate') {
+            steps {
+                script {
+                    withSonarQubeEnv(SONARQUBE_SERVER) {
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK') {
+                            error "Quality Gate failed: ${qg.status}"
+                        }
+                        else {
+                            echo "Quality Gate Success"
+                        }
+                    }
+                }
+            }
+        }
 
-        // // Build Stage
-        // stage("build"){
-        //     steps{
-        //         bat '@echo off'
-        //         bat 'echo %WORKSPACE%'
-        //         dir("DevOpsScripts") {
-        //             bat './build_script.bat %BUILD_NUMBER%'
-        //         }
-        //     }
-        // }
+        // Build Stage
+        stage("build"){
+            steps{
+                bat '@echo off'
+                bat 'echo %WORKSPACE%'
+                dir("DevOpsScripts") {
+                    bat './build_script.bat %BUILD_NUMBER%'
+                }
+            }
+        }
 
-        // // Push Images to docker hub
-        // stage("push"){
-        //     steps{
-        //         withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-        //             bat '@echo off'
-        //             bat 'echo %WORKSPACE%'
-        //             dir("DevOpsScripts") {
-        //                 bat './push_script.bat %BUILD_NUMBER%'
-        //             }
-        //         }
-        //     }
-        // }
+        // Push Images to docker hub
+        stage("push"){
+            steps{
+                withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
+                    bat '@echo off'
+                    bat 'echo %WORKSPACE%'
+                    dir("DevOpsScripts") {
+                        bat './push_script.bat %BUILD_NUMBER%'
+                    }
+                }
+            }
+        }
 
-        // // Helm Chart Stage
-        // stage("Helm Chart") {
-        //     steps {
-        //         script {
-        //             // Update Helm chart values.yaml with the build number
-        //             updateHelmChartValues(env.BUILD_NUMBER)
-        //             dir("node-js-app-chart") {
-        //                 // Run commands to create the Helm chart (e.g., helm package)
-        //                 bat '@echo off'
-        //                 bat 'echo "Creating package"'
-        //                 bat 'helm package .'
-        //                 // Capture the name of the Helm chart package
-        //                 helmPackageName = bat(script: 'dir /B *.tgz', returnStdout: true).trim()
-        //                 // Print the package name for verification
-        //                 echo "Helm chart package name: ${helmPackageName}"
-        //             }
-        //         }
-        //     }
-        // }
+        // Helm Chart Stage
+        stage("Helm Chart") {
+            steps {
+                script {
+                    // Update Helm chart values.yaml with the build number
+                    updateHelmChartValues(env.BUILD_NUMBER)
+                    dir("node-js-app-chart") {
+                        // Run commands to create the Helm chart (e.g., helm package)
+                        bat '@echo off'
+                        bat 'echo "Creating package"'
+                        bat 'helm package .'
+                        // Capture the name of the Helm chart package
+                        helmPackageName = bat(script: 'dir /B *.tgz', returnStdout: true).trim()
+                        // Print the package name for verification
+                        echo "Helm chart package name: ${helmPackageName}"
+                    }
+                }
+            }
+        }
 
-        // // Push Helm Chart to Docker Hub
-        // stage("Push Helm Chart to Docker Hub") {
-        //     steps {
-        //         script {
-        //             dir("node-js-app-chart") {
-        //                 withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-        //                     // Push the Helm chart to Docker Hub
-        //                     echo "Helm chart package name:-------- ${helmPackageName}"
-        //                     bat "helm push nodejs-app-0.1.0.tgz  oci://registry-1.docker.io/v2devops"
-        //                     // echo "helm chart push successful"
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        // Push Helm Chart to Docker Hub
+        stage("Push Helm Chart to Docker Hub") {
+            steps {
+                script {
+                    dir("node-js-app-chart") {
+                        withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
+                            // Push the Helm chart to Docker Hub
+                            echo "Helm chart package name:-------- ${helmPackageName}"
+                            bat "helm push nodejs-app-0.1.0.tgz  oci://registry-1.docker.io/v2devops"
+                            // echo "helm chart push successful"
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
