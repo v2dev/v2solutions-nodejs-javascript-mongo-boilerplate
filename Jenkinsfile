@@ -90,7 +90,7 @@ pipeline{
                         bat 'echo "Creating package"'
                         bat 'helm package .'
                         // Capture the name of the Helm chart package
-                        helmPackageName = bat(script: 'dir /B *.tgz', returnStatus: true).trim()
+                        helmPackageName = bat(script: 'dir /B *.tgz', returnStdout: true).trim()
                         
                         // Print the package name for verification
                         echo "Helm chart package name: ${helmPackageName}"
