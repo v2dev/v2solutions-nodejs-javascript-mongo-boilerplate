@@ -65,6 +65,19 @@ pipeline{
             }
         }
 
+        // Push Images to docker hub
+        stage("push"){
+            steps{
+                withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
+                    bat '@echo off'
+                    bat 'echo %WORKSPACE%'
+                    dir("DevOpsScripts") {
+                        bat './push_script.bat %BUILD_NUMBER%'
+                    }
+                }
+            }
+        }
+
         // Helm Chart Stage
         stage("Helm Chart") {
             steps {
@@ -91,19 +104,6 @@ pipeline{
                             bat "helm push nodejs-app-0.1.0.tgz  oci://registry-1.docker.io/v2devops"
                             // echo "helm chart push successful"
                         }
-                    }
-                }
-            }
-        }
-        
-        // Push Images to docker hub
-        stage("push"){
-            steps{
-                withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-                    bat '@echo off'
-                    bat 'echo %WORKSPACE%'
-                    dir("DevOpsScripts") {
-                        bat './push_script.bat %BUILD_NUMBER%'
                     }
                 }
             }
