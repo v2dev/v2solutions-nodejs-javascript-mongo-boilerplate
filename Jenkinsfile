@@ -34,7 +34,7 @@ pipeline{
                         def scanOutput = bat "./sonarqube_script.bat ${scannerHome} ${projectKey}"
 
                         // Extract SonarQube URL from the scan output
-                        def sonarqubeUrl = scanOutput =~ /.*results at:: (.*)$/
+                        def sonarqubeUrl = scanOutput =~ /INFO: ANALYSIS SUCCESSFUL, you can find the results at: (.+)$/
                         if (sonarqubeUrl) {
                             sonarqubeUrl = sonarqubeUrl[0][1]
                             echo "SonarQube Analysis URL: ${sonarqubeUrl}"
