@@ -1,0 +1,9 @@
+replicaCount: 1
+image:
+  repository: v2devops/v2solutions-nodejs-boilerplate
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  name: nodejs-app
+  type: ClusterIP
+  port: 8080
