@@ -115,7 +115,7 @@ pipeline{
                         withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
                             // Push the Helm chart to Docker Hub
                             echo "Helm chart package name:-------- ${helmPackageName}"
-                            bat "helm push nodejs-app-0.1.0.tgz  oci://registry-1.docker.io/v2devops"
+                            bat "helm push node-js-app-chart-0.1.0.tgz  oci://registry-1.docker.io/v2devops"
                             // echo "helm chart push successful"
                         }
                     }
