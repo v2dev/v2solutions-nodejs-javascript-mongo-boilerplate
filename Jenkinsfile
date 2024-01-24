@@ -89,6 +89,11 @@ pipeline{
                         bat '@echo off'
                         bat 'echo "Creating package"'
                         bat 'helm package .'
+                        // Capture the name of the Helm chart package
+                        helmPackageName = bat(script: 'dir /B *.tgz', returnStatus: true).trim()
+                        
+                        // Print the package name for verification
+                        echo "Helm chart package name: ${helmPackageName}"
                     }
                 }
             }
@@ -101,6 +106,7 @@ pipeline{
                     dir("node-js-app-chart") {
                         withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
                             // Push the Helm chart to Docker Hub
+                            echo "Helm chart package name:-------- ${helmPackageName}"
                             bat "helm push nodejs-app-0.1.0.tgz  oci://registry-1.docker.io/v2devops"
                             // echo "helm chart push successful"
                         }
