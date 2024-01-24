@@ -32,7 +32,10 @@ pipeline{
                     withSonarQubeEnv(SONARQUBE_SERVER) {
                         echo "Current working directory: ${pwd()}"
                         bat "./sonarqube_script.bat ${scannerHome} ${projectKey}"
-                        echo "SONARQUBE SERVER IS---- ${SONARQUBE_SERVER}"
+
+                        // Manually construct the SonarQube Analysis URL
+                        def sonarqubeUrl = "${SONARQUBE_SERVER}/dashboard?id=${projectKey}"
+                        echo "SonarQube Analysis URL: ${sonarqubeUrl}"
                     }
                 }
             }   
