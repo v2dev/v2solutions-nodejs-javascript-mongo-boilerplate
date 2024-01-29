@@ -56,7 +56,7 @@ pipeline{
                         // Send email using the emailext plugin
                         emailext body: emailBody,
                                 subject: 'SonarQube Analysis Report',
-                                to: 'sagar.thorat@v2solutions.com',
+                                to: 'sagar.sthorat@gmail.com',
                                 mimeType: 'text/html'
                     } else {
                         error "SonarQube Analysis URL is not available. Make sure the previous stage executed successfully."
