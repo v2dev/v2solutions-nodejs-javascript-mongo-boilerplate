@@ -2,13 +2,13 @@ require('dotenv').config();
 const express = require('express');
 
 const {
-    loginUser,
-    registerUser,
-    mfaVerifyUser,
-    forgetUser,
-    resetUser,
-    validateEmail,
-    verifyGoogleToken
+  loginUser,
+  registerUser,
+  mfaVerifyUser,
+  forgetUser,
+  resetUser,
+  validateEmail,
+  verifyGoogleToken,
 } = require('../controllers/AuthController');
 
 const router = express.Router();

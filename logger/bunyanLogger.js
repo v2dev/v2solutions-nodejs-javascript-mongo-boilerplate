@@ -1,9 +1,9 @@
-"use-strict";
+'use-strict';
 
-const bunyan = require("bunyan");
-const moment = require("moment");
+const bunyan = require('bunyan');
+const moment = require('moment');
 
-const env = process.env.NODE_ENV || "development";
+const env = process.env.NODE_ENV || 'development';
 
 const loglevels = {
   ERROR: 'error',
@@ -11,22 +11,22 @@ const loglevels = {
   INFO: 'info',
   VERBOSE: 'verbose',
   DEBUG: 'debug',
-  SILLY: 'silly'
+  SILLY: 'silly',
 };
 
 function Ec_Service_call(req) {
   return {
-    v2_function: req.functionName || "V2BackEnd",
-    ex_api_url: req.API_URL || "",
-    ex_api_payload: req.requestObj || "",
-    ex_api_response: req.response || "",
-    log_time: moment().format("MMMM Do YYYY  h:mm:ss a"),
+    v2_function: req.functionName || 'V2BackEnd',
+    ex_api_url: req.API_URL || '',
+    ex_api_payload: req.requestObj || '',
+    ex_api_response: req.response || '',
+    log_time: moment().format('MMMM Do YYYY  h:mm:ss a'),
   };
 }
 
 const logger = bunyan.createLogger({
-  name: "Backend",
-  application: "log",
+  name: 'Backend',
+  application: 'log',
   app_env: env,
   serializers: {
     Ex_serviceErr_call: Ec_Service_call,
@@ -47,7 +47,7 @@ const logger = bunyan.createLogger({
     {
       stream: process.stdout,
       level: loglevels.INFO,
-    }
+    },
   ],
 });
 

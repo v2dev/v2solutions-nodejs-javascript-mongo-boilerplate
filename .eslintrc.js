@@ -1,43 +1,20 @@
 module.exports = {
-     "eslint.enable": false,
-    'env': {
-        'browser': true,
-        'commonjs': true,
-        'es2021': true
-    },
-    'extends': 'eslint:recommended',
-    'overrides': [
-        {
-            'env': {
-                'node': true
-            },
-            'files': [
-                '.eslintrc.{js,cjs}'
-            ],
-            'parserOptions': {
-                'sourceType': 'script'
-            }
-        }
-    ],
-    'parserOptions': {
-        'ecmaVersion': 'latest'
-    },
-    'rules': {
-        'indent': [
-            'error',
-            4
-        ],
-        'linebreak-style': [
-            'error',
-            'windows'
-        ],
-        'quotes': [
-            'error',
-            'single'
-        ],
-        'semi': [
-            'error',
-            'always'
-        ]
-    }
+  env: {
+    node: true,  // Add this line to specify Node.js environment
+    browser: true,
+    commonjs: true,
+    es2021: true,
+  },
+  extends: 'eslint:recommended',
+  parserOptions: {
+    ecmaVersion: 12,
+  },
+  rules: {
+    indent: ['error', 2],
+    'no-multiple-empty-lines': ['error', { max: 1 }],
+    semi: ['error', 'always'],
+    quotes: ['error', 'single'],
+    'comma-dangle': ['error', 'always-multiline'],
+  },
 };
+  
