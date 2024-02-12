@@ -8,7 +8,7 @@ image:
   repository: v2devops/v2solutions-nodejs-boilerplate
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "65"
+  tag: "78"
 
 imagePullSecrets: []
 nameOverride: ""
